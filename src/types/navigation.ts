@@ -1,0 +1,1 @@
+export type AppView = 'catalog' | 'basket' | 'quotation' | 'admin';
