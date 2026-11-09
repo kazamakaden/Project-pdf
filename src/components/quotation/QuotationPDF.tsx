@@ -70,16 +70,39 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
     try {
       const html2pdfModule = await import('html2pdf.js');
       const html2pdf = html2pdfModule.default;
-      await html2pdf()
-        .set({
-          margin: 0,
-          filename: (meta.quotationNo || 'quotation') + '.pdf',
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        })
-        .from(element)
-        .save();
+
+      /**
+       * ตัว typings ของ html2pdf.js ยังไม่มีตัวเลือก pagebreak (แม้ตัวไลบรารีรองรับ)
+       * จึงประกาศชนิดเพิ่มจากชนิดของ Worker ที่ไลบรารีให้มา เพื่อไม่ต้องใช้ any
+       */
+      type PdfWorker = InstanceType<typeof html2pdf.Worker>;
+      type PdfOptions = Parameters<PdfWorker['set']>[0] & {
+        pagebreak?: {
+          mode?: string[];
+          avoid?: string[];
+        };
+      };
+
+      const options: PdfOptions = {
+        margin: 0,
+        filename: (meta.quotationNo || 'quotation') + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        // กันการตัดกลางบรรทัด/กลางตาราง: ถ้าเนื้อหายาวเกิน 1 หน้า ให้ขึ้นหน้าใหม่ทั้งบล็อก
+        pagebreak: {
+          mode: ['css', 'legacy'],
+          avoid: [
+            'tr',
+            '.quotation-summary',
+            '.quotation-baht',
+            '.quotation-note',
+            '.quotation-signature',
+          ],
+        },
+      };
+
+      await html2pdf().set(options).from(element).save();
       showToast('ดาวน์โหลดใบเสนอราคาเรียบร้อย');
     } catch (error) {
       console.error(error);
