@@ -23,7 +23,7 @@ const QuotationPreview = forwardRef<HTMLDivElement, QuotationPreviewProps>(funct
     <div
       ref={ref}
       className="mx-auto bg-white text-slate-900"
-      style={{ width: '794px', minHeight: '1120px', padding: '24px 36px', boxSizing: 'border-box' }}
+      style={{ width: '794px', minHeight: '1120px', padding: '22px 36px', boxSizing: 'border-box' }}
     >
       <div className="flex items-start justify-between gap-4 border-b-2 border-[#1E40AF] pb-2">
         <div className="flex max-w-[68%] items-start gap-3">
@@ -143,35 +143,35 @@ const QuotationPreview = forwardRef<HTMLDivElement, QuotationPreviewProps>(funct
 
       <div className="quotation-summary mt-2 flex justify-end">
         <div className="w-[240px] text-[11px] text-slate-700">
-          <div className="flex justify-between leading-snug">
+          <div className="flex justify-between leading-relaxed">
             <span className="text-slate-500">รวมเป็นเงิน</span>
             <span>{formatCurrency(totals.subtotal)}</span>
           </div>
           {totals.includeVat ? (
-            <div className="flex justify-between leading-snug">
+            <div className="flex justify-between leading-relaxed">
               <span className="text-slate-500">ภาษีมูลค่าเพิ่ม 7%</span>
               <span>{formatCurrency(totals.vat)}</span>
             </div>
           ) : null}
-          <div className="flex justify-between border-t border-slate-500 py-0.5 text-sm font-bold text-[#1E40AF]">
+          <div className="mt-2 flex justify-between border-t border-slate-500 pt-0.5 text-sm font-bold text-[#1E40AF]">
             <span>รวมทั้งสิ้น</span>
             <span>{formatCurrency(totals.grandTotal)}</span>
           </div>
         </div>
       </div>
 
-      <p className="quotation-baht mt-0.5 text-[11px] text-slate-700">
+      <p className="quotation-baht text-[11px] text-slate-700">
         <span className="text-slate-500">(ตัวอักษร) </span>
         {bahtText(totals.grandTotal)}
       </p>
 
       {meta.note ? (
-        <p className="quotation-note mt-2 bg-slate-50 px-2 py-1 text-[10px] text-slate-600">
+        <p className="quotation-note mt-1 bg-slate-50 px-2 py-1 text-[10px] text-slate-600">
           หมายเหตุ: {meta.note}
         </p>
       ) : null}
 
-      <div className="quotation-signature mt-5 flex justify-between text-center text-[11px]">
+      <div className="quotation-signature mt-4 flex justify-between text-center text-[11px]">
         <div className="w-[45%]">
           <div className="mx-auto h-10 w-40 border-b border-dotted border-slate-400" />
           <p className="mt-1 text-slate-600">ผู้สั่งซื้อ / ผู้อนุมัติ</p>
