@@ -11,8 +11,16 @@ import { isLocalDevelopment } from './env';
 import { HttpError } from './http';
 
 const COLLECTION = 'products';
+/** เก็บธงว่า "ใส่ข้อมูลตั้งต้นอัตโนมัติไปแล้ว" — ป้องกันการ seed ซ้ำ */
+const META_COLLECTION = 'meta';
+const SEED_MARKER_ID = 'catalog-seed-v1';
 const MAX_IMAGE_LENGTH = 2 * 1024 * 1024;
 const MAX_IMPORT_ITEMS = 3000;
+
+interface MetaDoc {
+  _id: string;
+  seededAt?: string;
+}
 
 /** ฟิลด์ที่ client ส่งมาแก้ไขได้ (ตรวจชนิดข้อมูลก่อนบันทึกทุกครั้ง) */
 export interface ProductInput {
@@ -34,6 +42,8 @@ export interface ProductRepo {
   update(id: string, patch: ProductInput): Promise<Product | null>;
   remove(id: string): Promise<boolean>;
   replaceAll(items: unknown): Promise<number>;
+  /** ใส่ข้อมูลตั้งต้นอัตโนมัติ (เรียกเฉพาะตอนที่ API อ่านแล้วพบว่าคลังว่าง) — คืนจำนวนที่เขียน (0 = เคย seed แล้ว) */
+  ensureSeeded(items: Product[]): Promise<number>;
 }
 
 function asText(value: unknown, fallback = ''): string {
@@ -120,6 +130,18 @@ function sortBySeq(items: Product[]): Product[] {
   return [...items].sort((a, b) => a.seq - b.seq);
 }
 
+/** MongoDB code 11000 = _id ซ้ำ (ทั้ง error เดี่ยวและ bulk write จาก insertMany) */
+function isDuplicateKeyError(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null) return false;
+  if ((error as { code?: unknown }).code === 11000) return true;
+  const writeErrors = (error as { writeErrors?: Array<{ code?: number }> }).writeErrors;
+  return (
+    Array.isArray(writeErrors) &&
+    writeErrors.length > 0 &&
+    writeErrors.every((item) => item?.code === 11000)
+  );
+}
+
 // ---------------------------------------------------------------- MongoDB
 
 interface ProductDoc extends Product {
@@ -149,6 +171,24 @@ function mongoRepo(uri: string): ProductRepo {
   async function collection() {
     const client = await mongoClient(uri);
     return client.db(dbName).collection<ProductDoc>(COLLECTION);
+  }
+
+  async function meta() {
+    const client = await mongoClient(uri);
+    return client.db(dbName).collection<MetaDoc>(META_COLLECTION);
+  }
+
+  /** ตั้งธงว่า seed แล้ว (ใช้ร่วมกับ replaceAll ของแอดมิน) */
+  async function markSeeded(): Promise<void> {
+    try {
+      await (await meta()).updateOne(
+        { _id: SEED_MARKER_ID },
+        { $setOnInsert: { seededAt: new Date().toISOString() } },
+        { upsert: true },
+      );
+    } catch (error) {
+      console.warn('[api] เขียนธง seed ไม่สำเร็จ (ไม่กระทบข้อมูล):', error);
+    }
   }
 
   return {
@@ -199,6 +239,31 @@ function mongoRepo(uri: string): ProductRepo {
       const col = await collection();
       await col.deleteMany({});
       await col.insertMany(records.map((record) => ({ ...record, _id: record.id })));
+      // แอดมินตั้งข้อมูลเองแล้ว → ไม่ต้อง seed อัตโนมัติอีกแม้จะลบสินค้าออกจนหมด
+      await markSeeded();
+      return records.length;
+    },
+
+    async ensureSeeded(items) {
+      const records = normaliseImport(items);
+      const metaCol = await meta();
+
+      // เคยตั้งข้อมูลแล้ว (แอดมินนำเข้า/คืนค่าเอง) → ไม่ seed ซ้ำแม้คลังจะว่าง
+      if (await metaCol.findOne({ _id: SEED_MARKER_ID })) return 0;
+
+      // ใช้ insertMany แบบ ordered:false — ถ้าอีกคำขอ/อีก container ใส่พร้อมกัน
+      // เอกสารที่มี _id อยู่แล้วจะถูกข้าม (ไม่เกิดข้อมูลซ้ำ) และถ้าล้มกลางทาง
+      // คำขอครั้งถัดไปจะเติมส่วนที่ขาดให้เอง
+      try {
+        await (await collection()).insertMany(
+          records.map((record) => ({ ...record, _id: record.id })),
+          { ordered: false },
+        );
+      } catch (error) {
+        if (!isDuplicateKeyError(error)) throw error;
+      }
+
+      await markSeeded();
       return records.length;
     },
   };
@@ -285,6 +350,21 @@ function fileRepo(): ProductRepo {
 
     replaceAll(items) {
       return withFileLock(async () => {
+        const records = normaliseImport(items);
+        await writeLocalDb(records);
+        return records.length;
+      });
+    },
+
+    ensureSeeded(items) {
+      return withFileLock(async () => {
+        // มีไฟล์อยู่แล้ว = เคยตั้งข้อมูล (หรือแอดมินลบจนว่าง) → ไม่ seed ซ้ำ
+        try {
+          await fs.access(localDbFile());
+          return 0;
+        } catch {
+          /* ยังไม่เคยมีไฟล์ → seed ได้ */
+        }
         const records = normaliseImport(items);
         await writeLocalDb(records);
         return records.length;

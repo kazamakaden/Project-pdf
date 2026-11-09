@@ -6,6 +6,7 @@
  *   PUT    /api/products/:id    → แก้ไขสินค้า (แอดมินเท่านั้น)
  *   DELETE /api/products/:id    → ลบสินค้า (แอดมินเท่านั้น)
  */
+import { products as seedProducts } from '../../src/data/products';
 import { requireAdmin } from './lib/auth';
 import { errorResponse, HttpError, json } from './lib/http';
 import { getRepo } from './lib/repo';
@@ -57,8 +58,41 @@ export async function handleApi(event: ApiEvent): Promise<ApiResponse> {
     const repo = getRepo();
 
     if (method === 'GET') {
-      const products = await repo.list();
-      return json(200, { products, count: products.length, storage: repo.mode });
+      let products = await repo.list();
+      let seedError: string | undefined;
+
+      /**
+       * ฐานข้อมูลว่างครั้งแรก (ยังไม่มีใครกด "นำเข้าข้อมูลตั้งต้น") → ใส่ข้อมูลตั้งต้นให้อัตโนมัติ
+       * ครั้งเดียว เพื่อให้เว็บที่ deploy ใหม่ใช้งานได้ทันทีโดยไม่ต้องล็อกอินแอดมินก่อน
+       * (ถ้าเขียนไม่สำเร็จ เช่น ผู้ใช้ MongoDB เป็น read-only จะไม่ทำให้ GET ล้ม — แค่แสดงผลว่าง)
+       */
+      if (products.length === 0) {
+        try {
+          await repo.ensureSeeded(seedProducts);
+        } catch (error) {
+          console.error('[api] ใส่ข้อมูลตั้งต้นอัตโนมัติไม่สำเร็จ:', error);
+          seedError =
+            error instanceof Error && error.message
+              ? error.message
+              : 'เขียนข้อมูลตั้งต้นลงฐานข้อมูลไม่สำเร็จ';
+        }
+
+        // คำขออื่นอาจกำลัง seed อยู่ หรือเพิ่งเขียนเสร็จ → อ่านซ้ำอีกไม่กี่ครั้งก่อนตอบว่าว่าง
+        for (let attempt = 0; attempt < 4 && products.length === 0; attempt += 1) {
+          if (attempt > 0) await new Promise((resolve) => setTimeout(resolve, 200));
+          products = await repo.list();
+        }
+      }
+
+      const payload: Record<string, unknown> = {
+        products,
+        count: products.length,
+        storage: repo.mode,
+      };
+      // ส่งสาเหตุกลับไปให้หน้าเว็บแสดงในแบนเนอร์ เพื่อให้ผู้ดูแลระบบตามแก้ได้ทันที
+      if (seedError) payload.seedError = seedError;
+
+      return json(200, payload);
     }
 
     if (method === 'POST') {

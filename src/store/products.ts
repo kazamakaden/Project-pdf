@@ -68,13 +68,13 @@ export const useProductStore = create<ProductCatalogState>()((set, get) => {
 
       set({ status: 'loading', error: null });
       try {
-        const list = await api.listProducts();
+        const { products: list, seedError } = await api.listProducts();
         if (list.length === 0) {
           set({
             products: sortProducts(seedProducts),
             status: 'ready',
             source: 'seed',
-            error: null,
+            error: seedError ?? null,
           });
           return;
         }

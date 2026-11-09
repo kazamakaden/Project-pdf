@@ -81,13 +81,23 @@ export interface ProductInput {
   imageUrl?: string;
 }
 
+export interface ProductListResult {
+  products: Product[];
+  /** ข้อผิดพลาดตอนเซิร์ฟเวอร์พยายามใส่ข้อมูลตั้งต้นอัตโนมัติ (ถ้ามี) — ใช้แจ้งในแบนเนอร์ */
+  seedError?: string;
+}
+
 export const api = {
-  /** รายการสินค้าทั้งหมด (สาธารณะ) */
-  async listProducts(): Promise<Product[]> {
-    const data = await request<{ products?: Product[] }>('/products', {
+  /** รายการสินค้าทั้งหมด (สาธารณะ) — เซิร์ฟเวอร์จะใส่ข้อมูลตั้งต้นอัตโนมัติถ้าฐานข้อมูลว่าง */
+  async listProducts(): Promise<ProductListResult> {
+    const data = await request<{ products?: Product[]; seedError?: string }>('/products', {
       headers: { accept: 'application/json' },
     });
-    return Array.isArray(data.products) ? data.products : [];
+    return {
+      products: Array.isArray(data.products) ? data.products : [],
+      seedError:
+        typeof data.seedError === 'string' && data.seedError ? data.seedError : undefined,
+    };
   },
 
   /** เพิ่มสินค้า (ต้องเป็นแอดมิน) */

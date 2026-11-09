@@ -170,7 +170,7 @@ export function AdminPanel({ onNavigate }: AdminPanelProps) {
         <div className="mb-4 flex flex-col gap-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-700/60 dark:bg-amber-950/40 dark:text-amber-200 sm:flex-row sm:items-center sm:justify-between">
           <p>
             {catalogError
-              ? 'เชื่อมต่อฐานข้อมูลไม่ได้: ' + catalogError
+              ? 'เชื่อมต่อหรือบันทึกข้อมูลลงฐานข้อมูลไม่ได้: ' + catalogError
               : 'ฐานข้อมูลยังว่าง — ข้อมูลที่เห็นคือข้อมูลตั้งต้นที่ฝังมากับเว็บ'}
             {' '}กดปุ่มด้านขวาเพื่อเขียนข้อมูลตั้งต้น {SEED_PRODUCT_COUNT} รายการลงฐานข้อมูล
           </p>
