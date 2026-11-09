@@ -196,6 +196,8 @@ try {
     'แสดงชื่อหน่วยงานใหม่',
     await evaluate(`document.body.innerText.includes('วิทยาลัยเทคนิคอุดรธานี')`),
   );
+  // รอให้แคตตาล็อกโหลดจาก API เสร็จก่อนนับการ์ด (ข้อมูลมาจากฐานข้อมูล/ไฟล์ จึงเป็น async)
+  await waitFor(`document.querySelectorAll('article').length > 0`, 20000);
   const cards = await evaluate(`document.querySelectorAll('article').length`);
   check('แสดงการ์ดสินค้า', cards > 0, `${cards} การ์ด`);
   check(
@@ -203,6 +205,10 @@ try {
     await evaluate(`!!document.querySelector('select[aria-label="ขนาดสินค้า"]')`),
   );
 
+  await waitFor(
+    `!!document.querySelector('select[aria-label="ขนาดสินค้า"] option:not([value="all"])')`,
+    10000,
+  );
   const pickedSize = await evaluate(`(() => {
     const select = document.querySelector('select[aria-label="ขนาดสินค้า"]');
     const option = select ? Array.from(select.options).find((o) => o.value !== 'all') : null;
@@ -309,28 +315,91 @@ try {
   const searchCount = await evaluate(`document.querySelectorAll('article').length`);
   check('ค้นหาสินค้าที่เพิ่มใหม่ในแคตตาล็อกได้', searchCount === 1, `${searchCount} การ์ด`);
 
-  // ---------- 7) หน้าใบเสนอราคา ----------
+  // ---------- 7) หน้าใบขออนุมัติสั่งซื้อ ----------
   await evaluate(`(() => {
     const el = Array.from(document.querySelectorAll('button'))
-      .find((node) => (node.innerText || '').trim() === 'ใบเสนอราคา');
+      .find((node) => (node.innerText || '').trim() === 'ใบขออนุมัติสั่งซื้อ');
     if (!el) return false;
     el.click();
     return true;
   })()`);
-  await waitFor(`document.body.innerText.includes('สร้างใบเสนอราคา')`);
+  await waitFor(`document.body.innerText.includes('สร้างใบรายการขออนุมัติสั่งซื้อ')`);
   check(
-    'ใบเสนอราคาแสดงข้อมูลหน่วยงานจาก SITE',
+    'ใบขออนุมัติสั่งซื้อแสดงข้อมูลหน่วยงานจาก SITE',
     await evaluate(`(() => {
       const text = document.body.innerText;
-      return text.includes('0994000000000') && text.includes('042-221-336');
+      return text.includes('042-221538') && !text.includes('0994000000000');
     })()`),
   );
   check(
-    'โลโก้แสดงในหัวใบเสนอราคา',
+    'มีหัวข้อ "ความสอดคล้องกับนโยบาย" 5 รายการ',
+    await evaluate(`(() => {
+      const page = document.querySelector('div[style*="794px"]');
+      const text = page ? page.innerText : '';
+      return (
+        text.includes('ความสอดคล้องกับนโยบาย') &&
+        text.includes('ปรัชญาเศรษฐกิจพอเพียง') &&
+        text.includes('ยุทธศาสตร์การพัฒนาจังหวัดอุดรธานี') &&
+        text.includes('รวมค่าวัสดุ')
+      );
+    })()`),
+  );
+  check(
+    'ไม่มีบรรทัดตัวอักษร "(ตัวอักษร)" และผู้ลงนามเดิม',
+    await evaluate(`(() => {
+      const page = document.querySelector('div[style*="794px"]');
+      const text = page ? page.innerText : '';
+      return !text.includes('(ตัวอักษร)') && !text.includes('ผู้เสนอราคา');
+    })()`),
+  );
+  check(
+    'โลโก้แสดงในหัวใบขออนุมัติสั่งซื้อ',
     await evaluate(`(() => {
       const page = document.querySelector('div[style*="794px"]');
       const img = page ? page.querySelector('img[src="/logo.png"]') : null;
       return Boolean(img && img.complete && img.naturalWidth > 0);
+    })()`),
+  );
+
+  // ---------- 7b) หน้าทำเนียบบุคลากร ----------
+  const personnelApiOk = await evaluate(
+    `fetch('/api/personnel').then((r) => r.json()).then((d) => Array.isArray(d.people)).catch(() => false)`,
+  );
+  check('API ทำเนียบบุคลากรตอบกลับได้', personnelApiOk === true);
+
+  await clickByText('ทำเนียบบุคลากร');
+  check(
+    'เปิดหน้าทำเนียบบุคลากรได้',
+    await waitFor(`document.body.innerText.includes('รายชื่อและตำแหน่งของบุคลากรงานพัสดุ')`),
+  );
+  check(
+    'แอดมินเห็นฟอร์มเพิ่มบุคลากร',
+    await evaluate(`!!document.getElementById('person-name')`),
+  );
+  check(
+    'Footer มีหัวข้อทำเนียบบุคลากร',
+    await evaluate(`(() => {
+      const footer = document.querySelector('footer');
+      return !!footer && footer.innerText.includes('ทำเนียบบุคลากร');
+    })()`),
+  );
+  check(
+    'เพิ่ม/ลบรายชื่อบุคลากรผ่าน API ได้',
+    await evaluate(`(async () => {
+      const token = 'Bearer local-admin:' + ${JSON.stringify(ADMIN_EMAIL)};
+      const created = await fetch('/api/personnel', {
+        method: 'POST',
+        headers: { authorization: token, 'content-type': 'application/json' },
+        body: JSON.stringify({ name: 'บุคลากรทดสอบ Smoke', position: 'ทดสอบระบบ' }),
+      }).then((r) => r.json()).catch(() => ({}));
+      if (!created.person) return false;
+      const list = await fetch('/api/personnel').then((r) => r.json()).catch(() => ({}));
+      const found = (list.people || []).some((p) => p.name === 'บุคลากรทดสอบ Smoke');
+      await fetch('/api/personnel?id=' + encodeURIComponent(created.person.id), {
+        method: 'DELETE',
+        headers: { authorization: token },
+      });
+      return found;
     })()`),
   );
 

@@ -31,7 +31,12 @@ function devApiPlugin(env: Record<string, string>): Plugin {
       server.middlewares.use('/api', (req, res) => {
         void (async () => {
           try {
-            const { handleApi } = await server.ssrLoadModule('/netlify/functions/products.ts');
+            // เลือก Netlify Function ตาม path: /api/personnel → personnel.ts, ที่เหลือ → products.ts
+            const pathname = (req.url ?? '/').split('?')[0];
+            const functionPath = pathname.startsWith('/personnel')
+              ? '/netlify/functions/personnel.ts'
+              : '/netlify/functions/products.ts';
+            const { handleApi } = await server.ssrLoadModule(functionPath);
 
             const chunks: Buffer[] = [];
             for await (const chunk of req) chunks.push(Buffer.from(chunk as Uint8Array));

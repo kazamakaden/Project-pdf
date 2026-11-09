@@ -1,1 +1,1 @@
-export type AppView = 'catalog' | 'basket' | 'quotation' | 'admin';
+export type AppView = 'catalog' | 'basket' | 'quotation' | 'personnel' | 'admin';

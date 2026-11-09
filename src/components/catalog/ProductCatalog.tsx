@@ -49,7 +49,7 @@ export function ProductCatalog() {
           แคตตาล็อกวัสดุสำนักงาน
         </h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">
-          สินค้าทั้งหมด {catalog.length} รายการ เลือกหยิบใส่ตะกร้าเพื่อออกใบเสนอราคา
+          สินค้าทั้งหมด {catalog.length} รายการ เลือกหยิบใส่ตะกร้าเพื่อสร้างใบขออนุมัติสั่งซื้อ
         </p>
       </div>
 

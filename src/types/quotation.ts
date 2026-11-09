@@ -1,16 +1,9 @@
+/** ข้อมูลผู้ขออนุมัติสั่งซื้อ (กรอกในหน้าสร้างเอกสาร) */
 export interface CustomerInfo {
-  contactName: string;
-  organization: string;
-  address: string;
-  taxId: string;
-}
-
-export interface QuotationMeta {
-  quotationNo: string;
-  issueDate: string;
-  validUntil: string;
-  reference: string;
-  note: string;
+  /** ชื่อ-นามสกุลผู้ขอ */
+  requesterName: string;
+  /** หน่วยงาน / แผนก / ฝ่าย */
+  department: string;
 }
 
 export interface QuotationTotals {

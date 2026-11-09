@@ -4,6 +4,7 @@
  * - ถ้า API อยู่คนละโดเมน ให้ตั้ง VITE_API_URL ใน Environment Variables
  */
 import { useAuthStore } from '@/store/auth';
+import type { Person } from '@/types/person';
 import type { Product } from '@/types/product';
 
 const BASE = (import.meta.env.VITE_API_URL ?? '').trim().replace(/\/+$/, '');
@@ -87,6 +88,11 @@ export interface ProductListResult {
   seedError?: string;
 }
 
+export interface PersonInput {
+  name: string;
+  position: string;
+}
+
 export const api = {
   /** รายการสินค้าทั้งหมด (สาธารณะ) — เซิร์ฟเวอร์จะใส่ข้อมูลตั้งต้นอัตโนมัติถ้าฐานข้อมูลว่าง */
   async listProducts(): Promise<ProductListResult> {
@@ -136,5 +142,41 @@ export const api = {
       body: JSON.stringify({ mode: 'replace', products }),
     });
     return typeof data.imported === 'number' ? data.imported : products.length;
+  },
+
+  /** รายชื่อบุคลากรทั้งหมด (สาธารณะ — ใช้แสดงใน Footer และหน้าทำเนียบบุคลากร) */
+  async listPersonnel(): Promise<Person[]> {
+    const data = await request<{ people?: Person[] }>('/personnel', {
+      headers: { accept: 'application/json' },
+    });
+    return Array.isArray(data.people) ? data.people : [];
+  },
+
+  /** เพิ่มบุคลากร (ต้องเป็นแอดมิน) */
+  async createPerson(input: PersonInput): Promise<Person> {
+    const data = await request<{ person: Person }>('/personnel', {
+      method: 'POST',
+      headers: adminHeaders(),
+      body: JSON.stringify(input),
+    });
+    return data.person;
+  },
+
+  /** แก้ไขชื่อ/ตำแหน่งบุคลากร (ต้องเป็นแอดมิน) */
+  async updatePerson(id: string, patch: Partial<PersonInput>): Promise<Person> {
+    const data = await request<{ person: Person }>('/personnel?id=' + encodeURIComponent(id), {
+      method: 'PUT',
+      headers: adminHeaders(),
+      body: JSON.stringify(patch),
+    });
+    return data.person;
+  },
+
+  /** ลบบุคลากร (ต้องเป็นแอดมิน) */
+  async deletePerson(id: string): Promise<void> {
+    await request<{ deleted: string }>('/personnel?id=' + encodeURIComponent(id), {
+      method: 'DELETE',
+      headers: adminHeaders(),
+    });
   },
 };

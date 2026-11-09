@@ -14,6 +14,7 @@ import {
   ShoppingCartIcon,
   StoreIcon,
   SunIcon,
+  UsersIcon,
 } from '@animateicons/react/lucide';
 import { Button } from '@/components/ui/button';
 import { SITE } from '@/config/site';
@@ -56,7 +57,8 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { id: 'catalog', label: 'แคตตาล็อก', icon: StoreIcon },
   { id: 'basket', label: 'ตะกร้าสินค้า', icon: ShoppingCartIcon },
-  { id: 'quotation', label: 'ใบเสนอราคา', icon: FileTextIcon },
+  { id: 'quotation', label: 'ใบขออนุมัติสั่งซื้อ', icon: FileTextIcon },
+  { id: 'personnel', label: 'ทำเนียบบุคลากร', icon: UsersIcon },
   { id: 'admin', label: 'ผู้ดูแลระบบ', icon: LockIcon },
 ];
 

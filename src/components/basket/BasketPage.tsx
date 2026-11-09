@@ -28,7 +28,7 @@ export function BasketPage({ onNavigate }: BasketPageProps) {
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">ตะกร้าสินค้า</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            ตรวจสอบรายการและจำนวนก่อนสร้างใบเสนอราคา
+            ตรวจสอบรายการและจำนวนก่อนสร้างใบขออนุมัติสั่งซื้อ
           </p>
         </div>
         {items.length > 0 && (
@@ -119,7 +119,7 @@ export function BasketPage({ onNavigate }: BasketPageProps) {
               </div>
             </div>
             <Button variant="accent" className="w-full" onClick={() => onNavigate('quotation')}>
-              สร้างใบเสนอราคา <ArrowRight className="h-4 w-4" />
+              สร้างใบรายการขออนุมัติสั่งซื้อ <ArrowRight className="h-4 w-4" />
             </Button>
             <Button variant="outline" className="w-full" onClick={() => onNavigate('catalog')}>
               เลือกสินค้าเพิ่ม

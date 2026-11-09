@@ -127,7 +127,7 @@ export function BasketDrawer({ onNavigate }: BasketDrawerProps) {
                 ดูตะกร้า
               </Button>
               <Button variant="accent" size="sm" onClick={() => goTo('quotation')}>
-                ออกใบเสนอราคา
+                สร้างใบขออนุมัติ
               </Button>
             </div>
           </div>
