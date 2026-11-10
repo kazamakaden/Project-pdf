@@ -51,6 +51,16 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
 
     setIsGenerating(true);
     try {
+      /**
+       * ต้องรอฟอนต์ Sarabun โหลดครบก่อนจับภาพ
+       * ไม่อย่างนั้น html2canvas จะวาดด้วยฟอนต์สำรอง ทำให้ตัวอักษรไทยใน PDF เพี้ยน/ล้นช่อง
+       */
+      if (document.fonts) {
+        await document.fonts.load('13px Sarabun');
+        await document.fonts.ready;
+      }
+      await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+
       const html2pdfModule = await import('html2pdf.js');
       const html2pdf = html2pdfModule.default;
 
@@ -69,13 +79,20 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
       const options: PdfOptions = {
         margin: 0,
         filename: buildFileName(),
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        // JPEG คุณภาพสูงที่ 288 dpi: ตัวอักษรยังคมชัดเมื่อพิมพ์ แต่ไฟล์ไม่ใหญ่จนส่งอีเมลไม่ได้
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: {
+          // 3 เท่า = ประมาณ 288 dpi เมื่อพิมพ์ A4 (ความละเอียดที่เครื่องพิมพ์ออฟฟิศอ่านออกสบาย)
+          scale: 3,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          logging: false,
+        },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         // กันการตัดกลางบรรทัด/กลางตาราง: ถ้าเนื้อหายาวเกิน 1 หน้า ให้ขึ้นหน้าใหม่ทั้งบล็อก
         pagebreak: {
           mode: ['css', 'legacy'],
-          avoid: ['tr', '.quotation-table'],
+          avoid: ['.quotation-table > div'],
         },
       };
 

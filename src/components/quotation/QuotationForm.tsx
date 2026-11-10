@@ -38,8 +38,8 @@ export function QuotationForm({ customer, onCustomerChange }: QuotationFormProps
           </div>
         </div>
         <p className="rounded-md bg-slate-50 p-3 text-xs leading-relaxed text-slate-500 dark:bg-slate-800/60 dark:text-slate-400">
-          ภาษีมูลค่าเพิ่ม 7% เปิด/ปิดได้ที่หน้าตะกร้าสินค้า และเอกสารจะแสดงยอดรวมเป็น “รวมค่าวัสดุ”
-          ตามแบบฟอร์ม
+          ภาษีมูลค่าเพิ่ม 7% เปิด/ปิดได้ที่หน้าตะกร้าสินค้า — ถ้าเปิด เอกสารจะแสดง “รวมค่าวัสดุ”,
+          “ภาษีมูลค่าเพิ่ม 7%” และ “รวมทั้งสิ้น” เพื่อให้ยอดบวกกันได้จริง
         </p>
       </section>
     </div>

@@ -353,11 +353,16 @@ try {
     })()`),
   );
   check(
-    'โลโก้แสดงในหัวใบขออนุมัติสั่งซื้อ',
+    'หัวเอกสารเป็นแบบเดียวกับ Expense_Estimation_Form.xlsx',
     await evaluate(`(() => {
       const page = document.querySelector('div[style*="794px"]');
-      const img = page ? page.querySelector('img[src="/logo.png"]') : null;
-      return Boolean(img && img.complete && img.naturalWidth > 0);
+      if (!page) return false;
+      const text = page.innerText;
+      const columns = ['ลำดับที่', 'รายการ', 'จำนวน', 'หน่วย', 'ราคา/หน่วย', 'รวมเงิน', 'หมายเหตุ'];
+      return (
+        text.includes('ประมาณการค่าใช้จ่าย (ค่าใช้สอย/ค่าตอบแทน/ค่าวัสดุ)') &&
+        columns.every((name) => text.includes(name))
+      );
     })()`),
   );
 
