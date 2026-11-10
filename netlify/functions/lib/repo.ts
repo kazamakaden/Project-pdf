@@ -154,7 +154,7 @@ function toProduct(doc: ProductDoc): Product {
 }
 
 /** เปิด connection ครั้งเดียวแล้วใช้ซ้ำระหว่าง invocation (container ที่ยังอุ่นอยู่) */
-function mongoClient(uri: string): Promise<MongoClient> {
+export function mongoClient(uri: string): Promise<MongoClient> {
   const holder = globalThis as unknown as { __udtcMongoClient?: Promise<MongoClient> };
   if (!holder.__udtcMongoClient) {
     holder.__udtcMongoClient = new MongoClient(uri, {

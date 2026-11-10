@@ -378,14 +378,15 @@ try {
     })()`),
   );
 
-  check(
-    'มีเลขที่เอกสารและวันที่ไทยบนใบ',
-    await evaluate(`(() => {
+  const docNumberReady = await waitFor(
+    `(() => {
       const page = document.querySelector('div[style*="794px"]');
       const text = page ? page.innerText : '';
-      return /PR-\\d{4}-\\d{4}-\\d{3}/.test(text) && /วันที่/.test(text);
-    })()`),
+      return /PR-\\d{4}-\\d{4}-\\d{3,}/.test(text) && /วันที่/.test(text);
+    })()`,
+    10000,
   );
+  check('มีเลขที่เอกสารและวันที่ไทยบนใบ', docNumberReady);
 
   check(
     'มีตัวเลือกฟอนต์เอกสาร 2 แบบ และค่าเริ่มต้นเป็น TH Sarabun New',

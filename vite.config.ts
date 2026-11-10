@@ -31,11 +31,13 @@ function devApiPlugin(env: Record<string, string>): Plugin {
       server.middlewares.use('/api', (req, res) => {
         void (async () => {
           try {
-            // เลือก Netlify Function ตาม path: /api/personnel → personnel.ts, ที่เหลือ → products.ts
+            // เลือก Netlify Function ตาม path: /api/personnel, /api/doc-number, ที่เหลือ → products.ts
             const pathname = (req.url ?? '/').split('?')[0];
             const functionPath = pathname.startsWith('/personnel')
               ? '/netlify/functions/personnel.ts'
-              : '/netlify/functions/products.ts';
+              : pathname.startsWith('/doc-number')
+                ? '/netlify/functions/doc-number.ts'
+                : '/netlify/functions/products.ts';
             const { handleApi } = await server.ssrLoadModule(functionPath);
 
             const chunks: Buffer[] = [];

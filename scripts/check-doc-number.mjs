@@ -149,10 +149,46 @@ try {
     evalJs(`(() => {
       const page = document.querySelector('div[style*="794px"]');
       const text = page ? page.innerText : '';
-      const codeMatch = text.match(/PR-\\d{4}-\\d{4}-\\d{3}/);
+      const codeMatch = text.match(/PR-\\d{4}-\\d{4}-\\d{3,}/);
       const dateMatch = text.match(/วันที่\\s+(.+)/);
       return { code: codeMatch ? codeMatch[0] : '', date: dateMatch ? dateMatch[1].trim() : '' };
     })()`);
+
+  const seqOf = (code) => {
+    const match = /-(\d+)$/.exec(code || '');
+    return match ? Number(match[1]) : 0;
+  };
+
+  // 0) API กลางต้องเดินเลขเพิ่มทีละ 1 (ข้ามได้ถ้าทดสอบโหมด API ล่ม)
+  const FAIL_API = process.env.FAIL_API === '1';
+  let api2 = { code: '', seq: 0 };
+  if (FAIL_API) {
+    await client.send('Page.addScriptToEvaluateOnNewDocument', {
+      source: `(() => {
+        const original = window.fetch;
+        window.fetch = (input, init) => {
+          const url = typeof input === 'string' ? input : (input && input.url) || '';
+          if (String(url).includes('/api/doc-number')) {
+            return Promise.reject(new Error('simulated offline'));
+          }
+          return original(input, init);
+        };
+      })();`,
+    });
+    check('โหมดจำลอง API ล่ม: ข้ามการทดสอบ API กลาง', true);
+  } else {
+    const callApi = async () => {
+      const response = await fetch(new URL('/api/doc-number', APP_URL), { method: 'POST' });
+      return response.json();
+    };
+    const api1 = await callApi();
+    api2 = await callApi();
+    check(
+      'API กลางออกเลขเพิ่มทีละ 1 (วันเดียวกัน)',
+      api2.seq === api1.seq + 1 && api2.isoDate === api1.isoDate,
+      `${api1.code} → ${api2.code}`,
+    );
+  }
 
   const reloadPage = async () => {
     await evalJs('window.__reloadMarker = true');
@@ -172,8 +208,13 @@ try {
   // หลังจากโหลดครั้งแรกแล้ว ไม่ต้อง seed ซ้ำในการรีโหลด
   await client.send('Page.removeScriptToEvaluateOnNewDocument', { identifier: seedScript });
   const first = await readDoc();
-  check('มีเลขที่เอกสารรูปแบบ PR-ปี-เดือนวัน-ลำดับ', /^PR-\d{4}-\d{4}-\d{3}$/.test(first.code), first.code);
+  check('มีเลขที่เอกสารรูปแบบ PR-ปี-เดือนวัน-ลำดับ', /^PR-\d{4}-\d{4}-\d{3,}$/.test(first.code), first.code);
   check('มีวันที่ไทย (พ.ศ.)', /25\d{2}/.test(first.date), first.date);
+  check(
+    'หน้าเว็บได้เลขที่เอกสาร (API กลาง หรือเลขสำรอง)',
+    FAIL_API ? true : seqOf(first.code) === api2.seq + 1,
+    FAIL_API ? '(โหมด API ล่ม — ใช้เลขสำรอง)' : `${first.code} (API ล่าสุด ${api2.code})`,
+  );
 
   // 2) รีเฟรชหน้าเดิม → ต้องได้เลขเดิม (ใบเดียวกัน)
   await reloadPage();

@@ -180,3 +180,29 @@ export const api = {
     });
   },
 };
+
+/** ผลลัพธ์จาก API ออกเลขที่เอกสารกลาง */
+export interface RemoteDocNumber {
+  code: string;
+  seq: number;
+  isoDate: string;
+  dateLabel: string;
+  source: 'mongodb' | 'file';
+}
+
+/**
+ * ขอเลขที่เอกสารจากเซิร์ฟเวอร์ (กันซ้ำข้ามเครื่อง)
+ * หมดเวลา 5 วินาทีแล้วถือว่าล้มเหลว เพื่อให้ฝั่งเว็บกลับไปใช้เลขสำรองในเครื่องได้ทันที
+ */
+export async function allocateDocNumberRemote(): Promise<RemoteDocNumber> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5000);
+  try {
+    return await request<RemoteDocNumber>('/doc-number', {
+      method: 'POST',
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+}

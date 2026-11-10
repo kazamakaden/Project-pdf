@@ -67,6 +67,10 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
       showToast('กรุณาเลือกสินค้าก่อนสร้างใบขออนุมัติสั่งซื้อ');
       return;
     }
+    if (!docCode) {
+      showToast('กำลังออกเลขที่เอกสาร กรุณารอสักครู่แล้วกดอีกครั้ง');
+      return;
+    }
     const element = previewRef.current;
     if (!element) return;
 
