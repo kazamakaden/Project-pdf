@@ -1,0 +1,83 @@
+/*
+ * ฟอนต์ที่ฝังมากับเว็บ (self-hosted) — ไม่โหลดจาก Google Fonts
+ * เพื่อให้ใช้งานได้ในเครือข่ายราชการที่ปิดกั้นอินเทอร์เน็ตภายนอก
+ * และให้ PDF ที่สร้างออกมามีฟอนต์เดิมทุกเครื่อง
+ *
+ * Sarabun = ฟอนต์ที่ใช้ในไฟล์ Expense_Estimation_Form.xlsx (ใช้ทั้งหน้าจอและ PDF)
+ * Prompt   = ฟอนต์หัวข้อของหน้าเว็บ (UI)
+ */
+
+/* ---------- TH Sarabun New (ฟอนต์ราชการ — ค่าเริ่มต้นของเอกสาร) ---------- */
+@font-face {
+  font-family: 'TH Sarabun New';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/THSarabunNew-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'TH Sarabun New';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/THSarabunNew-Bold.ttf') format('truetype');
+}
+
+/* ---------- Sarabun (เนื้อหา + เอกสาร PDF) ---------- */
+@font-face {
+  font-family: 'Sarabun';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/Sarabun-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Sarabun';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/Sarabun-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Sarabun';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/Sarabun-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Sarabun';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/Sarabun-Bold.ttf') format('truetype');
+}
+
+/* ---------- Prompt (หัวข้อหน้าเว็บ) ---------- */
+@font-face {
+  font-family: 'Prompt';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/Prompt-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Prompt';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/Prompt-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Prompt';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/Prompt-Bold.ttf') format('truetype');
+}

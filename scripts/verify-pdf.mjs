@@ -209,9 +209,16 @@ try {
       return true;
     })()`);
 
-  // ใส่ตะกร้าจำลองก่อนโหลดแอป
+  // ใส่ตะกร้าจำลองก่อนโหลดแอป (และเลือกฟอนต์เอกสารถ้าระบุ)
   await client.send('Page.addScriptToEvaluateOnNewDocument', {
-    source: `try { localStorage.setItem('lmc-basket', ${JSON.stringify(BASKET)}); } catch (e) {}`,
+    source: `try {
+      localStorage.setItem('lmc-basket', ${JSON.stringify(BASKET)});
+      ${
+        process.env.FONT
+          ? `localStorage.setItem('lmc-doc-font', ${JSON.stringify(process.env.FONT)});`
+          : ''
+      }
+    } catch (e) {}`,
   });
 
   await client.send('Page.navigate', { url: APP_URL });

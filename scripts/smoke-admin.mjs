@@ -316,6 +316,18 @@ try {
   check('ค้นหาสินค้าที่เพิ่มใหม่ในแคตตาล็อกได้', searchCount === 1, `${searchCount} การ์ด`);
 
   // ---------- 7) หน้าใบขออนุมัติสั่งซื้อ ----------
+  // ใส่สินค้าลงตะกร้า 1 รายการก่อน เพื่อให้ใบมีเลขที่เอกสาร
+  await evaluate(`(() => {
+    const card = document.querySelector('article');
+    const btn = card
+      ? Array.from(card.querySelectorAll('button')).find((node) => (node.innerText || '').includes('เพิ่ม'))
+      : null;
+    if (!btn) return false;
+    btn.click();
+    return true;
+  })()`);
+  await sleep(500);
+
   await evaluate(`(() => {
     const el = Array.from(document.querySelectorAll('button'))
       .find((node) => (node.innerText || '').trim() === 'ใบขออนุมัติสั่งซื้อ');
@@ -363,6 +375,24 @@ try {
         text.includes('ประมาณการค่าใช้จ่าย (ค่าใช้สอย/ค่าตอบแทน/ค่าวัสดุ)') &&
         columns.every((name) => text.includes(name))
       );
+    })()`),
+  );
+
+  check(
+    'มีเลขที่เอกสารและวันที่ไทยบนใบ',
+    await evaluate(`(() => {
+      const page = document.querySelector('div[style*="794px"]');
+      const text = page ? page.innerText : '';
+      return /PR-\\d{4}-\\d{4}-\\d{3}/.test(text) && /วันที่/.test(text);
+    })()`),
+  );
+
+  check(
+    'มีตัวเลือกฟอนต์เอกสาร 2 แบบ และค่าเริ่มต้นเป็น TH Sarabun New',
+    await evaluate(`(() => {
+      const el = document.getElementById('doc-font');
+      if (!el) return false;
+      return el.options.length === 2 && el.value === 'thsarabun';
     })()`),
   );
 

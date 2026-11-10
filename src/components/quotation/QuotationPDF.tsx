@@ -1,9 +1,12 @@
-import { useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Download, FileText, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { QuotationForm } from '@/components/quotation/QuotationForm';
 import { QuotationPreview } from '@/components/quotation/QuotationPreview';
 import { useBasketStore } from '@/store/basket';
+import { DOC_FONTS, docFontOption, useDocFontStore } from '@/store/docFont';
+import type { DocFontId } from '@/store/docFont';
+import { useDocNumberStore } from '@/store/docNumber';
 import { useUiStore } from '@/store/ui';
 import type { AppView } from '@/types/navigation';
 import type { CustomerInfo } from '@/types/quotation';
@@ -28,6 +31,24 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
   const items = useBasketStore((state) => state.items);
   const includeVat = useBasketStore((state) => state.includeVat);
   const showToast = useUiStore((state) => state.showToast);
+  const fontId = useDocFontStore((state) => state.font);
+  const setFont = useDocFontStore((state) => state.setFont);
+  const fontOption = docFontOption(fontId);
+
+  const docCode = useDocNumberStore((state) => state.code);
+  const docDate = useDocNumberStore((state) => state.dateLabel);
+  const syncDocNumber = useDocNumberStore((state) => state.sync);
+
+  /** ลายนิ้วมือของตะกร้า — ใช้ตัดสินว่าเป็นใบเดิมหรือใบใหม่ */
+  const basketKey = useMemo(() => {
+    if (items.length === 0) return '';
+    const lines = items.map((item) => `${item.product.id}:${item.quantity}:${item.product.price}`);
+    return `${lines.join('|')}|vat:${includeVat ? 1 : 0}`;
+  }, [items, includeVat]);
+
+  useEffect(() => {
+    syncDocNumber(basketKey);
+  }, [basketKey, syncDocNumber]);
 
   const previewRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -52,11 +73,15 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
     setIsGenerating(true);
     try {
       /**
-       * ต้องรอฟอนต์ Sarabun โหลดครบก่อนจับภาพ
+       * ต้องรอฟอนต์ของเอกสาร (TH Sarabun New หรือ Sarabun) โหลดครบก่อนจับภาพ
        * ไม่อย่างนั้น html2canvas จะวาดด้วยฟอนต์สำรอง ทำให้ตัวอักษรไทยใน PDF เพี้ยน/ล้นช่อง
        */
       if (document.fonts) {
-        await document.fonts.load('13px Sarabun');
+        await Promise.all([
+          document.fonts.load(`13px ${fontOption.family}`),
+          document.fonts.load(`bold 13px ${fontOption.family}`),
+          document.fonts.load(`bold 20px ${fontOption.family}`),
+        ]);
         await document.fonts.ready;
       }
       await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
@@ -117,7 +142,22 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
             กรอกชื่อผู้ขอและหน่วยงาน ตรวจสอบตัวอย่าง แล้วดาวน์โหลดเป็นไฟล์ PDF ขนาด A4
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+            <span className="whitespace-nowrap">แบบอักษรเอกสาร</span>
+            <select
+              id="doc-font"
+              value={fontId}
+              onChange={(event) => setFont(event.target.value as DocFontId)}
+              className="h-9 rounded-md border border-slate-300 bg-white px-2 text-sm text-slate-800 shadow-sm focus:border-royal focus:outline-none dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+            >
+              {DOC_FONTS.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
           <Button variant="outline" onClick={() => onNavigate('catalog')}>
             เลือกสินค้าเพิ่ม
           </Button>
@@ -143,7 +183,14 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
         </div>
 
         <div className="overflow-x-auto rounded-lg bg-slate-200 p-4 dark:bg-slate-800">
-          <QuotationPreview ref={previewRef} customer={customer} items={items} totals={totals} />
+          <QuotationPreview
+            ref={previewRef}
+            customer={customer}
+            items={items}
+            totals={totals}
+            docCode={docCode}
+            docDate={docDate}
+          />
         </div>
       </div>
     </section>
