@@ -1,0 +1,333 @@
+{
+ "source": "บริษัท ไอคิวเชาท์อิส — ใบเสนอราคาวัสดุสำนักงาน (41 รายการ)",
+ "rows": [
+  {
+   "seq": 1,
+   "name": "DOUBLE A/A4/80g/500แผ่น/BOX",
+   "qty": "1",
+   "unit": "รีม",
+   "unitPrice": "120",
+   "total": "120"
+  },
+  {
+   "seq": 2,
+   "name": "หมึกFujixerox-s2220",
+   "qty": "1",
+   "unit": "หลอด",
+   "unitPrice": "2900",
+   "total": "2900"
+  },
+  {
+   "seq": 3,
+   "name": "หมึกปริ้นเตอร์เลเซอร์HP-CF283A",
+   "qty": "1",
+   "unit": "กล่อง",
+   "unitPrice": "2890",
+   "total": "2890"
+  },
+  {
+   "seq": 4,
+   "name": "หมึกBrother-BT-D100-BK",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "280",
+   "total": "280"
+  },
+  {
+   "seq": 5,
+   "name": "หมึกBrother-BT-D100-C",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "250",
+   "total": "250"
+  },
+  {
+   "seq": 6,
+   "name": "หมึกBrother-BT-D100-M",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "250",
+   "total": "250"
+  },
+  {
+   "seq": 7,
+   "name": "หมึกBrother-BT-D100-Y",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "250",
+   "total": "250"
+  },
+  {
+   "seq": 8,
+   "name": "หมึกปริ้นเตอร์Brotherสีดำรุ่นDCP-T300/T310",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "320",
+   "total": "320"
+  },
+  {
+   "seq": 9,
+   "name": "หมึกปริ้นเตอร์Brotherสีฟ้ารุ่นDCP-T300/T50",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "280",
+   "total": "280"
+  },
+  {
+   "seq": 10,
+   "name": "หมึกปริ้นเตอร์Brotherสีชมพูรุ่นDCP-T300/T5",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "280",
+   "total": "280"
+  },
+  {
+   "seq": 11,
+   "name": "หมึกปริ้นเตอร์Brotherสีเหลือง DCP-T300/T50",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "280",
+   "total": "280"
+  },
+  {
+   "seq": 12,
+   "name": "กรรไกร8นิ้ว3M/1408",
+   "qty": "1",
+   "unit": "อัน",
+   "unitPrice": "80",
+   "total": "80"
+  },
+  {
+   "seq": 13,
+   "name": "กาวน้ำหลอด50CC-ม้า",
+   "qty": "1",
+   "unit": "หลอด",
+   "unitPrice": "30",
+   "total": "30"
+  },
+  {
+   "seq": 14,
+   "name": "เครื่องเย็บNo.10-AA",
+   "qty": "1",
+   "unit": "ตัว",
+   "unitPrice": "75",
+   "total": "75"
+  },
+  {
+   "seq": 15,
+   "name": "ขี้ผึ้งนับแบงค์",
+   "qty": "1",
+   "unit": "ตลับ",
+   "unitPrice": "35",
+   "total": "35"
+  },
+  {
+   "seq": 16,
+   "name": "ถ่านอัลคาไลน์AA/2A",
+   "qty": "1",
+   "unit": "ก้อน",
+   "unitPrice": "27.5",
+   "total": "27.5"
+  },
+  {
+   "seq": 17,
+   "name": "ถ่านอัลคาไลน์AAA/3A",
+   "qty": "1",
+   "unit": "ก้อน",
+   "unitPrice": "27.5",
+   "total": "27.5"
+  },
+  {
+   "seq": 18,
+   "name": "เทป OPP 2\"/50หลาสีน้ำตาล",
+   "qty": "1",
+   "unit": "ม้วน",
+   "unitPrice": "35",
+   "total": "35"
+  },
+  {
+   "seq": 19,
+   "name": "เทปการสองหน้า0.5\"x20หลา",
+   "qty": "1",
+   "unit": "ม้วน",
+   "unitPrice": "17",
+   "total": "17"
+  },
+  {
+   "seq": 20,
+   "name": "ปากกาลูกลื่นAA-0.5มม",
+   "qty": "1",
+   "unit": "กล่อง",
+   "unitPrice": "250",
+   "total": "250"
+  },
+  {
+   "seq": 21,
+   "name": "ตลับหมึกEpson 664 BK",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "300",
+   "total": "300"
+  },
+  {
+   "seq": 22,
+   "name": "ตลับหมึกEpson 664/C/L550",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "300",
+   "total": "300"
+  },
+  {
+   "seq": 23,
+   "name": "ตลับหมึกEpson 664/M/L550",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "300",
+   "total": "300"
+  },
+  {
+   "seq": 24,
+   "name": "ตลับหมึกEpson 664/Y/L550",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "300",
+   "total": "300"
+  },
+  {
+   "seq": 25,
+   "name": "ตลับหมึกCanon-G1000/790ดำ",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "420",
+   "total": "420"
+  },
+  {
+   "seq": 26,
+   "name": "ตลับหมึกCanon-G1000/790สีฟ้า",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "420",
+   "total": "420"
+  },
+  {
+   "seq": 27,
+   "name": "ตลับหมึกCanon-G1000/790สีแดง",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "420",
+   "total": "420"
+  },
+  {
+   "seq": 28,
+   "name": "ตลับหมึกCanon-G1000/790สีเหลือง",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "420",
+   "total": "420"
+  },
+  {
+   "seq": 29,
+   "name": "หมึกเติมepson003-ดำ",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "300",
+   "total": "300"
+  },
+  {
+   "seq": 30,
+   "name": "หมึกเติมepson003-น้ำเงิน",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "290",
+   "total": "290"
+  },
+  {
+   "seq": 31,
+   "name": "หมึกเติมepson003-เหลือง",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "290",
+   "total": "290"
+  },
+  {
+   "seq": 32,
+   "name": "หมึกเติมepson003-แดง",
+   "qty": "1",
+   "unit": "ขวด",
+   "unitPrice": "290",
+   "total": "290"
+  },
+  {
+   "seq": 33,
+   "name": "ลวดเสียบกระดาษNO.1ตราม้า",
+   "qty": "1",
+   "unit": "กล่อง",
+   "unitPrice": "12",
+   "total": "12"
+  },
+  {
+   "seq": 34,
+   "name": "น้ำยาลบคำผิดเพนเทล/12มล./แบบฟ้าZL31-W",
+   "qty": "1",
+   "unit": "ด้าม",
+   "unitPrice": "80",
+   "total": "80"
+  },
+  {
+   "seq": 35,
+   "name": "เทปลบคำผิดAA(5มม.x12ม.)",
+   "qty": "1",
+   "unit": "อัน",
+   "unitPrice": "50",
+   "total": "50"
+  },
+  {
+   "seq": 36,
+   "name": "ลิ้นแฟ้มหนา/แบบพลาสติก",
+   "qty": "1",
+   "unit": "กล่อง",
+   "unitPrice": "150",
+   "total": "150"
+  },
+  {
+   "seq": 37,
+   "name": "สติกเกอร์ พีวีซี A4 ใส",
+   "qty": "1",
+   "unit": "แพ็ค",
+   "unitPrice": "170",
+   "total": "170"
+  },
+  {
+   "seq": 38,
+   "name": "สก๊อตเทปใสแกนใหญ่1\"x36Y",
+   "qty": "1",
+   "unit": "ม้วน",
+   "unitPrice": "30",
+   "total": "30"
+  },
+  {
+   "seq": 39,
+   "name": "แฟ้มเสนอเซ็นต์",
+   "qty": "1",
+   "unit": "เล่ม",
+   "unitPrice": "190",
+   "total": "190"
+  },
+  {
+   "seq": 40,
+   "name": "โพสต์อิท1.5x50มม.-5สี",
+   "qty": "1",
+   "unit": "ห่อ",
+   "unitPrice": "70",
+   "total": "70"
+  },
+  {
+   "seq": 41,
+   "name": "กระดาษโฟโต้150G/100แผ่น-Fuji",
+   "qty": "1",
+   "unit": "แพ็ค",
+   "unitPrice": "250",
+   "total": "250"
+  }
+ ]
+}
