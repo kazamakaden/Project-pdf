@@ -174,6 +174,20 @@ try {
       pageScrollHeight: page ? page.scrollHeight : null,
       tableScrollHeight: table ? table.scrollHeight : null,
       count: pages.length,
+      headerCells: (() => {
+        const table = document.querySelector('.quotation-table');
+        if (!table) return null;
+        const row = table.children[0];
+        return Array.from(row.children).map((c) => {
+          const r = c.getBoundingClientRect();
+          const range = document.createRange();
+          range.selectNodeContents(c);
+          const tr = range.getBoundingClientRect();
+          return { text: (c.innerText || '').trim().slice(0, 12),
+                   cellCenter: Math.round(r.top + r.height / 2),
+                   textCenter: Math.round(tr.top + tr.height / 2) };
+        });
+      })(),
       titleRect: (() => {
         const t = document.querySelector('.doc-title-text');
         const box = t ? t.parentElement : null;

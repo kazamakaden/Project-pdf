@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, Download, FileText, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, FileText, Loader2, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { QuotationForm } from '@/components/quotation/QuotationForm';
 import { QuotationPreview } from '@/components/quotation/QuotationPreview';
@@ -39,6 +39,7 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isPrinting, setIsPrinting] = useState(false);
   const [customer, setCustomer] = useState<CustomerInfo>({
     requesterName: '',
     department: '',
@@ -59,6 +60,18 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
     setPageInput(String(page));
   };
 
+
+  /** พิมพ์/บันทึกเป็น PDF ด้วยเบราว์เซอร์ — ต้องเรนเดอร์ทุกหน้าก่อนสั่งพิมพ์ */
+  const handlePrint = async () => {
+    setIsPrinting(true);
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+    try {
+      window.print();
+    } finally {
+      setIsPrinting(false);
+    }
+  };
 
   const updateCustomer = (patch: Partial<CustomerInfo>) =>
     setCustomer((previous) => ({ ...previous, ...patch }));
@@ -184,6 +197,10 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
           <Button variant="outline" onClick={() => onNavigate('catalog')}>
             เลือกสินค้าเพิ่ม
           </Button>
+          <Button variant="outline" onClick={() => void handlePrint()} className="gap-2">
+            <Printer className="h-4 w-4" />
+            พิมพ์
+          </Button>
           <Button variant="accent" onClick={handleDownload} disabled={isGenerating} className="gap-2">
             {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
             {isGenerating ? 'กำลังสร้าง...' : 'ดาวน์โหลด PDF'}
@@ -248,14 +265,14 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
               </Button>
             </div>
           )}
-          <div className="overflow-x-auto">
+          <div className="doc-print-area overflow-x-auto">
             <QuotationPreview
               ref={previewRef}
               customer={customer}
               items={items}
               totals={totals}
               pageToShow={pageSafe - 1}
-              showAllPages={isGenerating}
+              showAllPages={isGenerating || isPrinting}
             />
           </div>
         </div>
