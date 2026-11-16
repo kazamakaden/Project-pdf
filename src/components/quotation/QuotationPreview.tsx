@@ -258,17 +258,19 @@ function QuotationPage({
           backgroundColor: PAPER,
           color: INK,
           border: `1.5px solid ${INK}`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          /**
+           * ใช้ line-height เท่าความสูง + textAlign แทน flex centering
+           * เพราะ html2canvas จัดกึ่งกลางแนวตั้งด้วย flex ไม่แม่น (ข้อความจมลงล่างกรอบ)
+           */
           fontWeight: 700,
           fontSize: 20 * scale,
-          lineHeight: 1.1,
+          lineHeight: '41px',
           textAlign: 'center',
+          boxSizing: 'border-box',
           padding: '0 12px',
         }}
       >
-        ประมาณการค่าใช้จ่าย (ค่าใช้สอย/ค่าตอบแทน/ค่าวัสดุ)
+        <span style={{ display: 'block', marginTop: -11 * scale }}>ประมาณการค่าใช้จ่าย (ค่าใช้สอย/ค่าตอบแทน/ค่าวัสดุ)</span>
       </div>
 
       {/* ข้อมูลผู้ขอ + เลขที่เอกสาร/วันที่ (แถวว่างใน xlsx) */}
