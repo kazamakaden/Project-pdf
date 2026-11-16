@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react';
-import type { UIEvent } from 'react';
 import { ChevronLeft, ChevronRight, Download, FileText, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { QuotationForm } from '@/components/quotation/QuotationForm';
@@ -37,7 +36,7 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
 
 
   const previewRef = useRef<HTMLDivElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
+
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [customer, setCustomer] = useState<CustomerInfo>({
@@ -51,19 +50,15 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
   const pageCount = Math.max(1, Math.ceil(items.length / 20));
   const pageSafe = Math.min(currentPage, pageCount);
 
+  /** พิมพ์เลขหน้าแล้วกด Enter เพื่อกระโดดไปหน้านั้น */
+  const [pageInput, setPageInput] = useState('1');
+
   const goToPage = (target: number) => {
     const page = Math.min(Math.max(target, 1), pageCount);
     setCurrentPage(page);
-    const node = previewRef.current?.children[page - 1] as HTMLElement | undefined;
-    node?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setPageInput(String(page));
   };
 
-  const handlePreviewScroll = (event: UIEvent<HTMLDivElement>) => {
-    const el = event.currentTarget;
-    const index = Math.floor(el.scrollTop / 1120) + 1;
-    const next = Math.min(Math.max(index, 1), pageCount);
-    if (next !== currentPage) setCurrentPage(next);
-  };
 
   const updateCustomer = (patch: Partial<CustomerInfo>) =>
     setCustomer((previous) => ({ ...previous, ...patch }));
@@ -211,9 +206,9 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
         </div>
 
         <div className="rounded-lg bg-slate-200 p-4 dark:bg-slate-800">
-          {/* แถบเลื่อนหน้าเอกสาร — กันดูตัวอย่างแล้วนึกว่าเอกสารขาด */}
+          {/* แถบเลือกหน้าเอกสาร — ดูทีละหน้าเหมือนโปรแกรมอ่าน PDF */}
           {pageCount > 1 && (
-            <div className="mb-3 flex items-center justify-center gap-3">
+            <div className="mb-3 flex items-center justify-center gap-2 text-sm text-slate-700 dark:text-slate-200">
               <Button
                 type="button"
                 variant="outline"
@@ -224,9 +219,23 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="min-w-[7rem] text-center text-sm font-medium text-slate-700 dark:text-slate-200">
-                หน้า {pageSafe} / {pageCount}
-              </span>
+              <span>หน้า</span>
+              <input
+                type="number"
+                min={1}
+                max={pageCount}
+                value={pageInput}
+                aria-label="เลขหน้า"
+                onChange={(event) => setPageInput(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === 'Go') {
+                    goToPage(Number(pageInput) || 1);
+                  }
+                }}
+                onBlur={() => goToPage(Number(pageInput) || pageSafe)}
+                className="h-9 w-16 rounded-md border border-slate-300 bg-white text-center text-sm text-slate-800 shadow-sm focus:border-royal focus:outline-none dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+              />
+              <span>/ {pageCount}</span>
               <Button
                 type="button"
                 variant="outline"
@@ -239,20 +248,14 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
               </Button>
             </div>
           )}
-          <div
-            ref={scrollRef}
-            onScroll={handlePreviewScroll}
-            className={
-              isGenerating
-                ? 'overflow-x-auto'
-                : 'max-h-[80vh] overflow-auto rounded-md shadow-inner'
-            }
-          >
+          <div className="overflow-x-auto">
             <QuotationPreview
               ref={previewRef}
               customer={customer}
               items={items}
               totals={totals}
+              pageToShow={pageSafe - 1}
+              showAllPages={isGenerating}
             />
           </div>
         </div>

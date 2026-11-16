@@ -452,10 +452,14 @@ interface QuotationPreviewProps {
   customer: CustomerInfo;
   items: BasketItem[];
   totals: QuotationTotals;
+  /** ลำดับหน้าที่แสดงบนจอ (0 = หน้าแรก) — ไม่ระบุ = แสดงทุกหน้า */
+  pageToShow?: number;
+  /** true = แสดงทุกหน้าใน DOM ใช้ตอนจับภาพเป็น PDF เท่านั้น */
+  showAllPages?: boolean;
 }
 
 const QuotationPreview = forwardRef<HTMLDivElement, QuotationPreviewProps>(function QuotationPreview(
-  { customer, items, totals },
+  { customer, items, totals, pageToShow, showAllPages },
   ref,
 ) {
   const fontId = useDocFontStore((state) => state.font);
@@ -470,13 +474,19 @@ const QuotationPreview = forwardRef<HTMLDivElement, QuotationPreviewProps>(funct
   if (pages.length === 0) pages.push([]);
   const lastPage = pages.length - 1;
 
+  /** หน้าจอ: ทีละหน้า (เหมือนโปรแกรมอ่าน PDF) · ตอนจับภาพ: ทุกหน้า */
+  const visibleIndexes =
+    showAllPages || pageToShow === undefined
+      ? pages.map((_, index) => index)
+      : [Math.min(Math.max(pageToShow, 0), lastPage)];
+
   return (
     <div ref={ref} style={{ width: PAGE_WIDTH, backgroundColor: '#FFFFFF', margin: '0 auto' }}>
-      {pages.map((pageItems, pageIndex) => (
+      {visibleIndexes.map((pageIndex) => (
         <QuotationPage
           key={pageIndex}
           customer={customer}
-          items={pageItems}
+          items={pages[pageIndex]}
           startIndex={pageIndex * ROWS_PER_PAGE}
           totals={totals}
           showTotal={pageIndex === lastPage}

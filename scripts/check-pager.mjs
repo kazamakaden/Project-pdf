@@ -120,11 +120,12 @@ try {
     })()`);
   const state = () =>
     run(`(() => {
-      const label = Array.from(document.querySelectorAll('span'))
-        .map((s) => (s.innerText || '').trim())
-        .find((t) => t.startsWith('หน้า '));
-      const box = document.querySelector('.quotation-table')?.parentElement?.parentElement?.parentElement;
-      return { label, scrollTop: Math.round(box ? box.scrollTop : -1) };
+      const input = document.querySelector('input[aria-label="เลขหน้า"]');
+      return {
+        page: input ? input.value : null,
+        pagesInDom: document.querySelectorAll('.quotation-table').length,
+        firstRow: (document.querySelector('.quotation-table')?.innerText || '').trim().split('\\n')[0],
+      };
     })()`);
 
   await click('ตะกร้าสินค้า');
@@ -132,6 +133,18 @@ try {
   await click('สร้างใบรายการขออนุมัติสั่งซื้อ');
   await sleep(1500);
   console.log('start', JSON.stringify(await state()));
+  // พิมพ์เลขหน้าแล้วกด Enter
+  await run(`(() => {
+    const input = document.querySelector('input[aria-label="เลขหน้า"]');
+    if (!input) return 'no-input';
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
+    setter.call(input, '2');
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    return 'typed';
+  })()`);
+  await sleep(800);
+  console.log('after-type-2', JSON.stringify(await state()));
   console.log('next:', await click('หน้าถัดไป'));
   await sleep(1200);
   console.log('after-next', JSON.stringify(await state()));
