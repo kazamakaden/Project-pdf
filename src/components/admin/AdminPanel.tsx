@@ -166,17 +166,21 @@ export function AdminPanel({ onNavigate }: AdminPanelProps) {
         </div>
       </div>
 
-      {source === 'seed' && (
+      {isAdmin && (
         <div className="mb-4 flex flex-col gap-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-700/60 dark:bg-amber-950/40 dark:text-amber-200 sm:flex-row sm:items-center sm:justify-between">
           <p>
-            {catalogError
-              ? 'เชื่อมต่อหรือบันทึกข้อมูลลงฐานข้อมูลไม่ได้: ' + catalogError
-              : 'ฐานข้อมูลยังว่าง — ข้อมูลที่เห็นคือข้อมูลตั้งต้นที่ฝังมากับเว็บ'}
-            {' '}กดปุ่มด้านขวาเพื่อเขียนข้อมูลตั้งต้น {SEED_PRODUCT_COUNT} รายการลงฐานข้อมูล
+            {source === 'seed'
+              ? catalogError
+                ? 'เชื่อมต่อหรือบันทึกข้อมูลลงฐานข้อมูลไม่ได้: ' + catalogError
+                : 'ฐานข้อมูลยังว่าง — ข้อมูลที่เห็นคือข้อมูลตั้งต้นที่ฝังมากับเว็บ'
+              : 'ข้อมูลในฐานข้อมูลมี ' +
+                catalog.length +
+                ' รายการ — กดปุ่มด้านขวาเพื่อแทนที่ทั้งชุดด้วยข้อมูลตั้งต้นชุดใหม่ที่ฝังมากับเว็บ'}
+            {' '}ข้อมูลตั้งต้นมี {SEED_PRODUCT_COUNT} รายการ
           </p>
           <div className="flex shrink-0 gap-2">
             <Button type="button" size="sm" disabled={saving} onClick={() => void handleImportSeed()}>
-              นำเข้าข้อมูลตั้งต้น
+              {source === 'seed' ? 'นำเข้าข้อมูลตั้งต้น' : 'แทนที่ทั้งชุด'}
             </Button>
             <Button
               type="button"
