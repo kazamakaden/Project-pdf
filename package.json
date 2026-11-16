@@ -5,13 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && npm run build:api",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.server.json --noEmit",
     "typecheck:api": "tsc -p tsconfig.server.json --noEmit",
     "preview": "vite preview",
     "smoke": "node scripts/smoke-admin.mjs",
     "build:api": "esbuild netlify/functions/products.ts netlify/functions/personnel.ts netlify/functions/doc-number.ts --bundle --platform=node --format=cjs --target=node20 --outdir=server/api --out-extension:.js=.cjs --external:mongodb --log-level=warning",
-    "build:render": "npm run build && npm run build:api",
+    "build:render": "npm run build",
     "start:render": "node server/index.mjs"
   },
   "dependencies": {
