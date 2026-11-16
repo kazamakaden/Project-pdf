@@ -117,7 +117,6 @@ function TableHeader({ scale }: { scale: number }) {
       <div
         style={{
           gridColumn: '5 / span 2',
-          width: 212,
           boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
@@ -152,7 +151,7 @@ function TableHeader({ scale }: { scale: number }) {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '100px 112px',
+            gridTemplateColumns: '1fr 1fr',
             width: '100%',
             height: 32,
             flex: '0 0 auto',
@@ -305,7 +304,7 @@ function QuotationPage({
             key={policy.label}
             style={{
               display: 'grid',
-              gridTemplateColumns: '330px 1fr',
+              gridTemplateColumns: '400px 1fr',
               minHeight: 25,
               alignItems: 'center',
               fontSize: 13.5 * scale,
