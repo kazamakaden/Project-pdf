@@ -38,7 +38,12 @@ const PRODUCT = {
 };
 
 const BASKET_ITEMS =
-  process.env.MANY === '1'
+  process.env.ITEMS
+    ? Array.from({ length: Number(process.env.ITEMS) }, (_, index) => ({
+        product: { ...PRODUCT, id: 'p' + (300 + index), seq: 300 + index, price: 290 },
+        quantity: 1,
+      }))
+    : process.env.MANY === '1'
     ? Array.from({ length: 25 }, (_, index) => ({
         product: { ...PRODUCT, id: 'p' + (200 + index), seq: 200 + index, price: 45 + index },
         quantity: 1,

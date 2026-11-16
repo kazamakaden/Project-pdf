@@ -415,13 +415,13 @@ function QuotationPage({
 
             {/* จำนวนเงินเป็นตัวอักษร เช่น "ห้าพันบาทถ้วน" — เส้นปิดท้ายตาราง (double) อยู่ที่แถวนี้ */}
             <div style={{ ...rowStyle, minHeight: 34, borderBottom: `3px double ${INK}` }}>
-              <div style={{ ...total, gridColumn: '1 / span 5', justifyContent: 'flex-start' }}>
+              <div style={{ ...total, gridColumn: '1 / span 3', justifyContent: 'flex-start' }}>
                 รวมทั้งสิ้น (ตัวอักษร)
               </div>
               <div
                 style={{
                   ...total,
-                  gridColumn: '6 / span 2',
+                  gridColumn: '4 / span 4',
                   justifyContent: 'flex-start',
                   ...lastCell,
                 }}
