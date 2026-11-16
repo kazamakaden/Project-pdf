@@ -76,95 +76,25 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
   const updateCustomer = (patch: Partial<CustomerInfo>) =>
     setCustomer((previous) => ({ ...previous, ...patch }));
 
+  /**
+   * สร้างเอกสารด้วยเอนจินพิมพ์ของเบราว์เซอร์ (Ctrl+P / Save as PDF)
+   * เลิกใช้ html2canvas เพราะวาดข้อความไทยต่ำกว่ากึ่งกลางช่องทุกช่อง ~9.5px
+   * ต้องเรนเดอร์ทุกหน้าก่อนสั่งพิมพ์ ไม่งั้นจะพิมพ์ได้แค่หน้าที่กำลังดูอยู่
+   */
   const handleDownload = async () => {
     if (items.length === 0) {
       showToast('กรุณาเลือกสินค้าก่อนสร้างใบขออนุมัติสั่งซื้อ');
       return;
     }
-    const element = previewRef.current;
-    if (!element) return;
-
     setIsGenerating(true);
-    const fileName = buildFileName();
-    try {
-      /**
-       * ต้องรอฟอนต์ของเอกสาร (TH Sarabun New หรือ Sarabun) โหลดครบก่อนจับภาพ
-       * ไม่อย่างนั้น html2canvas จะวาดด้วยฟอนต์สำรอง ทำให้ตัวอักษรไทยใน PDF เพี้ยน/ล้นช่อง
-       */
-      if (document.fonts) {
-        await Promise.all([
-          document.fonts.load(`13px ${fontOption.family}`),
-          document.fonts.load(`bold 13px ${fontOption.family}`),
-          document.fonts.load(`bold 20px ${fontOption.family}`),
-        ]);
-        await document.fonts.ready;
-      }
-      await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
 
-      // ชดเชยตำแหน่งข้อความเฉพาะตอนจับภาพ (หน้าจอไม่ถูกกระทบ)
-      element.dataset.pdfCapture = '1';
-      await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
-
-      const html2pdfModule = await import('html2pdf.js');
-      const html2pdf = html2pdfModule.default;
-
-      /**
-       * ตัว typings ของ html2pdf.js ยังไม่มีตัวเลือก pagebreak (แม้ตัวไลบรารีรองรับ)
-       * จึงประกาศชนิดเพิ่มจากชนิดของ Worker ที่ไลบรารีให้มา เพื่อไม่ต้องใช้ any
-       */
-      type PdfWorker = InstanceType<typeof html2pdf.Worker>;
-      type PdfOptions = Parameters<PdfWorker['set']>[0] & {
-        pagebreak?: {
-          mode?: string[];
-          avoid?: string[];
-        };
-      };
-
-      const options: PdfOptions = {
-        margin: 0,
-        filename: fileName,
-        // JPEG คุณภาพสูงที่ 288 dpi: ตัวอักษรยังคมชัดเมื่อพิมพ์ แต่ไฟล์ไม่ใหญ่จนส่งอีเมลไม่ได้
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: {
-          // 3 เท่า = ประมาณ 288 dpi เมื่อพิมพ์ A4 (ความละเอียดที่เครื่องพิมพ์ออฟฟิศอ่านออกสบาย)
-          scale: 4,
-          useCORS: true,
-          backgroundColor: '#ffffff',
-          logging: false,
-        },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        // กันการตัดกลางบรรทัด/กลางตาราง: ถ้าเนื้อหายาวเกิน 1 หน้า ให้ขึ้นหน้าใหม่ทั้งบล็อก
-        pagebreak: {
-          mode: ['css', 'legacy'],
-          avoid: ['.quotation-table > div'],
-        },
-      };
-
-      /**
-       * html2pdf มักต่อหน้าเปล่าเกินมา 1 หน้าเมื่อความสูงของฟอร์มชนขอบ A4 พอดี
-       * จึงสร้าง PDF ก่อน แล้วตัดหน้าที่เกินจำนวนที่ควรมี (20 แถว/หน้า) ทิ้งก่อนบันทึก
-       */
-      interface PdfDocument {
-        internal: { getNumberOfPages: () => number };
-        deletePage: (pageNumber: number) => void;
-        save: (fileName: string) => void;
-      }
-
-      const expectedPages = Math.max(1, Math.ceil(items.length / 20));
-      const pdf = (await html2pdf().set(options).from(element).toPdf().get('pdf')) as PdfDocument;
-      while (pdf.internal.getNumberOfPages() > expectedPages) {
-        pdf.deletePage(pdf.internal.getNumberOfPages());
-      }
-      pdf.save(fileName);
-      delete element.dataset.pdfCapture;
-      showToast('ดาวน์โหลดใบขออนุมัติสั่งซื้อเรียบร้อย');
-    } catch (error) {
-      console.error(error);
-      showToast('เกิดข้อผิดพลาดในการสร้าง PDF');
-      delete previewRef.current?.dataset.pdfCapture;
-    } finally {
-      setIsGenerating(false);
-    }
+    // เก็บทุกหน้าไว้จนกว่าหน้าต่างพิมพ์จะปิด (afterprint) แล้วค่อยกลับไปดูทีละหน้า
+    const finish = () => setIsGenerating(false);
+    window.addEventListener('afterprint', finish, { once: true });
+    window.setTimeout(finish, 60_000);
+    window.print();
   };
 
   return (
@@ -197,13 +127,9 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
           <Button variant="outline" onClick={() => onNavigate('catalog')}>
             เลือกสินค้าเพิ่ม
           </Button>
-          <Button variant="outline" onClick={() => void handlePrint()} className="gap-2">
-            <Printer className="h-4 w-4" />
-            พิมพ์
-          </Button>
           <Button variant="accent" onClick={handleDownload} disabled={isGenerating} className="gap-2">
-            {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-            {isGenerating ? 'กำลังสร้าง...' : 'ดาวน์โหลด PDF'}
+            {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
+            {isGenerating ? 'กำลังเตรียม...' : 'พิมพ์ / บันทึก PDF'}
           </Button>
         </div>
       </div>

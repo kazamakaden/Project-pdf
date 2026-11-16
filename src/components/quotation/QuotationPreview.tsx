@@ -171,6 +171,9 @@ function TableHeader({ scale }: { scale: number }) {
           <div
             style={{
               ...cell,
+              paddingTop: 0,
+              paddingBottom: 18,
+              boxSizing: 'border-box',
               borderRight: 'none',
               borderTop: `1.5px solid ${INK}`,
               borderBottom: 'none',
