@@ -27,3 +27,15 @@
     scrollbar-width: none;
   }
 }
+/* ข้อความไทยใน html2canvas ถูกวาดต่ำกว่าตำแหน่งจริงในเบราว์เซอร์ ~9-10px
+   (ความต่างของ ascent ระหว่างฟอนต์กับตัวจัดเรียงข้อความของไลบรารี)
+   จึงชดเชยเฉพาะตอนจับภาพเท่านั้น เพื่อให้หน้าจอยังกึ่งกลางถูกต้อง */
+.doc-title-text,
+.doc-baht-text {
+  display: block;
+}
+
+[data-pdf-capture='1'] .doc-title-text,
+[data-pdf-capture='1'] .doc-baht-text {
+  margin-top: var(--doc-shift, -10px);
+}

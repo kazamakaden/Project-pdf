@@ -93,6 +93,10 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
       }
       await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
 
+      // ชดเชยตำแหน่งข้อความเฉพาะตอนจับภาพ (หน้าจอไม่ถูกกระทบ)
+      element.dataset.pdfCapture = '1';
+      await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+
       const html2pdfModule = await import('html2pdf.js');
       const html2pdf = html2pdfModule.default;
 
@@ -144,10 +148,12 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
         pdf.deletePage(pdf.internal.getNumberOfPages());
       }
       pdf.save(fileName);
+      delete element.dataset.pdfCapture;
       showToast('ดาวน์โหลดใบขออนุมัติสั่งซื้อเรียบร้อย');
     } catch (error) {
       console.error(error);
       showToast('เกิดข้อผิดพลาดในการสร้าง PDF');
+      delete previewRef.current?.dataset.pdfCapture;
     } finally {
       setIsGenerating(false);
     }

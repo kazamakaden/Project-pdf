@@ -174,6 +174,17 @@ try {
       pageScrollHeight: page ? page.scrollHeight : null,
       tableScrollHeight: table ? table.scrollHeight : null,
       count: pages.length,
+      titleRect: (() => {
+        const t = document.querySelector('.doc-title-text');
+        const box = t ? t.parentElement : null;
+        const tr = t ? t.getBoundingClientRect() : null;
+        const br = box ? box.getBoundingClientRect() : null;
+        return tr && br ? {
+          textCenterY: Math.round(tr.top + tr.height / 2 - br.top),
+          textCenterX: Math.round(tr.left + tr.width / 2),
+          boxCenterY: Math.round(br.height / 2),
+        } : null;
+      })(),
     };
   })()`);
   console.log(JSON.stringify(info));

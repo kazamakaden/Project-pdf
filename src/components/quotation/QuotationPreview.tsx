@@ -246,6 +246,8 @@ function QuotationPage({
         color: INK,
         fontFamily,
         padding: `${PAD}px ${PAD_X}px ${PAD}px`,
+        // ระยะชดเชย ascent ของฟอนต์ไทย — ใช้เฉพาะตอนจับภาพเป็น PDF (ดู index.css)
+        ['--doc-shift' as string]: `${-12 * scale}px`,
         ...(isFirst
           ? null
           : { pageBreakBefore: 'always' as const, breakBefore: 'page' as const }),
@@ -270,7 +272,7 @@ function QuotationPage({
           padding: '0 12px',
         }}
       >
-        <span style={{ display: 'block', marginTop: -11 * scale }}>ประมาณการค่าใช้จ่าย (ค่าใช้สอย/ค่าตอบแทน/ค่าวัสดุ)</span>
+        <span className="doc-title-text">ประมาณการค่าใช้จ่าย (ค่าใช้สอย/ค่าตอบแทน/ค่าวัสดุ)</span>
       </div>
 
       {/* ข้อมูลผู้ขอ + เลขที่เอกสาร/วันที่ (แถวว่างใน xlsx) */}
@@ -434,7 +436,7 @@ function QuotationPage({
                 }}
               >
                 {/* ชดเชยระยะ ascent ของฟอนต์ไทยที่ html2canvas วาดต่ำกว่าปกติ */}
-                <span style={{ display: 'block', marginTop: -9 * scale }}>
+                <span className="doc-baht-text">
                   รวมทั้งสิ้น (ตัวอักษร) {bahtText(totals.grandTotal)}
                 </span>
               </div>
