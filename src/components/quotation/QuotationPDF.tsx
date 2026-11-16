@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Download, FileText, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { QuotationForm } from '@/components/quotation/QuotationForm';
@@ -10,7 +10,6 @@ import { useUiStore } from '@/store/ui';
 import type { AppView } from '@/types/navigation';
 import type { CustomerInfo } from '@/types/quotation';
 import { computeTotals } from '@/utils/calc';
-import { bangkokTodayIso, thaiDateLabel } from '@/utils/thaiDate';
 import { formatCurrency } from '@/utils/format';
 
 interface QuotationPDFProps {
@@ -35,8 +34,6 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
   const setFont = useDocFontStore((state) => state.setFont);
   const fontOption = docFontOption(fontId);
 
-  /** วันที่บนเอกสาร (เวลาไทย) — ไม่ต้องรอเลขที่เอกสารจากเซิร์ฟเวอร์แล้ว */
-  const docDate = useMemo(() => thaiDateLabel(bangkokTodayIso()), []);
 
   const previewRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -192,7 +189,6 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
             customer={customer}
             items={items}
             totals={totals}
-            docDate={docDate}
           />
         </div>
       </div>

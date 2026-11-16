@@ -25,16 +25,21 @@ import { bahtText } from '@/utils/bahttext';
 
 const PAGE_WIDTH = 794;
 const PAGE_HEIGHT = 1120;
-const PAD_X = 30;
+/**
+ * ระยะขอบ 10 มม. (38 px @96dpi) ทุกด้าน — เครื่องพิมพ์เลเซอร์/อิงก์เจ็ตทั่วไป
+ * พิมพ์ไม่ได้ถึงขอบกระดาษ ถ้าดันเนื้อหาชนขอบ เส้นตารางด้านขวา/ล่างจะหายตอนปริ้น
+ */
+const PAD = 38;
+const PAD_X = PAD;
 
-/** ความกว้างคอลัมน์ A-G (รวม = 734 px = ความกว้างเนื้อหา) */
-const COL_WIDTHS = [57, 214, 68, 68, 102, 112, 113];
+/** ความกว้างคอลัมน์ A-G (รวม = 718 px = ความกว้างเนื้อหา 794 - 2×38) */
+const COL_WIDTHS = [55, 205, 62, 62, 100, 112, 122];
 const COL_TEMPLATE = COL_WIDTHS.map((width) => `${width}px`).join(' ');
 
 /** จำนวนแถวต่อหน้า (เท่าแบบฟอร์มกระดาษ 20 แถว) */
 const ROWS_PER_PAGE = 20;
 const MIN_ROWS = ROWS_PER_PAGE;
-const ROW_HEIGHT = 30;
+const ROW_HEIGHT = 29;
 
 /** พื้นกระดาษ (ขาวล้วน) — เอกสารต้องมีแค่ดำ/ขาว */
 const PAPER = '#FFFFFF';
@@ -109,7 +114,7 @@ function TableHeader({ scale }: { scale: number }) {
       <div
         style={{
           gridColumn: '5 / span 2',
-          width: 214,
+          width: 212,
           boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
@@ -144,7 +149,7 @@ function TableHeader({ scale }: { scale: number }) {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '102px 112px',
+            gridTemplateColumns: '100px 112px',
             width: '100%',
             height: 32,
             flex: '0 0 auto',
@@ -211,8 +216,6 @@ interface PageProps {
   isFirst: boolean;
   scale: number;
   fontFamily: string;
-  /** วันที่ไทย เช่น 10 พฤศจิกายน 2569 */
-  docDate: string;
 }
 
 /** หนึ่งหน้ากระดาษ A4 — หน้าตาเหมือนกันทุกหน้า ต่างกันแค่รายการที่ต่อเนื่องกัน */
@@ -225,7 +228,6 @@ function QuotationPage({
   isFirst,
   scale,
   fontFamily,
-  docDate,
 }: PageProps) {
   const cell = baseCell(scale);
   const total = totalCell(scale);
@@ -241,7 +243,7 @@ function QuotationPage({
         backgroundColor: PAPER,
         color: INK,
         fontFamily,
-        padding: `24px ${PAD_X}px 16px`,
+        padding: `${PAD}px ${PAD_X}px ${PAD}px`,
         ...(isFirst
           ? null
           : { pageBreakBefore: 'always' as const, breakBefore: 'page' as const }),
@@ -250,7 +252,7 @@ function QuotationPage({
       {/* แถบหัวเรื่อง (A1:G1) — ขาว-ดำ: กรอบดำ ตัวอักษรดำ */}
       <div
         style={{
-          height: 46,
+          height: 44,
           backgroundColor: PAPER,
           color: INK,
           border: `1.5px solid ${INK}`,
@@ -288,11 +290,6 @@ function QuotationPage({
             หน่วยงาน/แผนก: <span style={{ fontWeight: 600 }}>{customer.department || '-'}</span>
           </span>
         </div>
-        <div style={{ textAlign: 'right', whiteSpace: 'nowrap', flex: '0 0 auto' }}>
-          <div>
-            วันที่ <span style={{ fontWeight: 600 }}>{docDate || '-'}</span>
-          </div>
-        </div>
       </div>
 
       {/* หัวข้อความสอดคล้องกับนโยบาย (A3:G8) */}
@@ -305,8 +302,8 @@ function QuotationPage({
             key={policy.label}
             style={{
               display: 'grid',
-              gridTemplateColumns: '345px 1fr',
-              minHeight: 26,
+              gridTemplateColumns: '330px 1fr',
+              minHeight: 25,
               alignItems: 'center',
               fontSize: 13.5 * scale,
               lineHeight: 1.3,
@@ -416,8 +413,8 @@ function QuotationPage({
               <div style={{ ...total, gridColumn: '7', ...lastCell }} />
             </div>
 
-            {/* จำนวนเงินเป็นตัวอักษร เช่น "ห้าพันบาทถ้วน" */}
-            <div style={{ ...rowStyle, minHeight: 28, borderBottom: 'none' }}>
+            {/* จำนวนเงินเป็นตัวอักษร เช่น "ห้าพันบาทถ้วน" — เส้นปิดท้ายตาราง (double) อยู่ที่แถวนี้ */}
+            <div style={{ ...rowStyle, minHeight: 34, borderBottom: `3px double ${INK}` }}>
               <div style={{ ...total, gridColumn: '1 / span 5', justifyContent: 'flex-start' }}>
                 รวมทั้งสิ้น (ตัวอักษร)
               </div>
@@ -432,7 +429,6 @@ function QuotationPage({
                 {bahtText(totals.grandTotal)}
               </div>
             </div>
-            <div style={{ height: 0, borderBottom: `3px double ${INK}` }} />
           </>
         ) : null}
       </div>
@@ -444,12 +440,10 @@ interface QuotationPreviewProps {
   customer: CustomerInfo;
   items: BasketItem[];
   totals: QuotationTotals;
-  /** วันที่ไทย (แสดงทุกหน้า) */
-  docDate: string;
 }
 
 const QuotationPreview = forwardRef<HTMLDivElement, QuotationPreviewProps>(function QuotationPreview(
-  { customer, items, totals, docDate },
+  { customer, items, totals },
   ref,
 ) {
   const fontId = useDocFontStore((state) => state.font);
@@ -477,7 +471,6 @@ const QuotationPreview = forwardRef<HTMLDivElement, QuotationPreviewProps>(funct
           isFirst={pageIndex === 0}
           scale={scale}
           fontFamily={fontFamily}
-          docDate={docDate}
         />
       ))}
     </div>
