@@ -168,8 +168,8 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
   };
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+    <section className="doc-print-shell mx-auto max-w-7xl px-4 py-8 sm:px-6">
+      <div className="doc-print-head mb-6 flex flex-wrap items-end justify-between gap-3">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">
             สร้างใบรายการขออนุมัติสั่งซื้อ
@@ -208,8 +208,8 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
-        <div>
+      <div className="doc-print-grid grid gap-6 xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
+        <div className="doc-print-side">
           <QuotationForm customer={customer} onCustomerChange={updateCustomer} />
           <div className="mt-4 flex items-center justify-between rounded-lg border border-royal/15 bg-white p-4 text-sm dark:border-slate-700 dark:bg-slate-900">
             <span className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
@@ -222,7 +222,7 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
           </div>
         </div>
 
-        <div className="rounded-lg bg-slate-200 p-4 dark:bg-slate-800">
+        <div className="doc-print-col rounded-lg bg-slate-200 p-4 dark:bg-slate-800">
           {/* แถบเลือกหน้าเอกสาร — ดูทีละหน้าเหมือนโปรแกรมอ่าน PDF */}
           {pageCount > 1 && (
             <div className="mb-3 flex items-center justify-center gap-2 text-sm text-slate-700 dark:text-slate-200">

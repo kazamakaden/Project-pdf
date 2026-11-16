@@ -50,6 +50,36 @@
     margin: 0;
   }
 
+  html,
+  body,
+  #root,
+  #root > div,
+  main {
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  header,
+  footer,
+  .doc-print-head,
+  .doc-print-side,
+  main > :not(.doc-print-shell) {
+    display: none !important;
+  }
+
+  .doc-print-shell,
+  .doc-print-grid,
+  .doc-print-col {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+    gap: 0 !important;
+  }
+
   body * {
     visibility: hidden !important;
   }
@@ -72,5 +102,12 @@
 
   .doc-print-area > div {
     margin: 0 auto !important;
+  }
+
+  /* 1120px = 296.3mm เผื่อขอบไว้ 2px กัน Chrome ปัดเศษเกิน A4 แล้วเกิดหน้าเปล่า */
+  .doc-print-area .doc-page {
+    height: 1118px !important;
+    min-height: 1118px !important;
+    overflow: hidden;
   }
 }

@@ -39,7 +39,7 @@ const COL_TEMPLATE = COL_WIDTHS.map((width) => `${width}px`).join(' ');
 /** จำนวนแถวต่อหน้า (เท่าแบบฟอร์มกระดาษ 20 แถว) */
 const ROWS_PER_PAGE = 20;
 const MIN_ROWS = ROWS_PER_PAGE;
-const ROW_HEIGHT = 29;
+const ROW_HEIGHT = 28;
 
 /** พื้นกระดาษ (ขาวล้วน) — เอกสารต้องมีแค่ดำ/ขาว */
 const PAPER = '#FFFFFF';
@@ -109,7 +109,7 @@ function TableHeader({ scale }: { scale: number }) {
   const cell = headerCell(scale);
 
   return (
-    <div style={{ ...rowStyle, minHeight: 68, borderBottom: `1.5px solid ${INK}` }}>
+    <div style={{ ...rowStyle, minHeight: 82, borderBottom: `1.5px solid ${INK}` }}>
       <div style={{ ...cell, gridColumn: '1' }}>ลำดับที่</div>
       <div style={{ ...cell, gridColumn: '2' }}>รายการ</div>
       <div style={{ ...cell, gridColumn: '3' }}>จำนวน</div>
@@ -135,13 +135,13 @@ function TableHeader({ scale }: { scale: number }) {
              * ต้องเผื่อที่ด้านล่างให้ตัวอักษรบรรทัดที่ 2 ไม่จมลงไปใต้เส้นคั่น
              * (TH Sarabun New มีระยะ ascent สูงกว่า Sarabun ทำให้ html2canvas วาดข้อความต่ำลง)
              */
-            minHeight: Math.ceil(15 * scale) * 2 + 6 + (scale > 1 ? 8 : 0),
+            minHeight: Math.ceil(15 * scale) * 2 + 18 + (scale > 1 ? 8 : 0),
             boxSizing: 'border-box',
             textAlign: 'center',
             fontSize: 12.5 * scale,
             lineHeight: `${Math.ceil(15 * scale)}px`,
             fontWeight: 700,
-            padding: '2px 4px 0',
+            padding: '8px 4px 4px',
           }}
         >
           ราคาที่สืบทราบ/
@@ -153,7 +153,7 @@ function TableHeader({ scale }: { scale: number }) {
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
             width: '100%',
-            height: 32,
+            height: 34,
             flex: '0 0 auto',
           }}
         >
@@ -238,6 +238,7 @@ function QuotationPage({
 
   return (
     <div
+      className="doc-page"
       style={{
         width: PAGE_WIDTH,
         minHeight: PAGE_HEIGHT,
@@ -421,7 +422,7 @@ function QuotationPage({
 
             {/* จำนวนเงินเป็นตัวอักษร เช่น "ห้าพันบาทถ้วน" — เส้นปิดท้ายตาราง (double) อยู่ที่แถวนี้ */}
             <div
-              style={{ ...rowStyle, height: 40, minHeight: 40, borderBottom: `3px double ${INK}` }}
+              style={{ ...rowStyle, height: 36, minHeight: 36, borderBottom: `3px double ${INK}` }}
             >
               {/* ช่องเดียวทั้งแถว: ป้ายกับจำนวนเงินเป็นตัวอักษรอยู่ด้วยกัน ไม่มีเส้นคั่นกลาง */}
               <div
