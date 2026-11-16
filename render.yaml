@@ -1,0 +1,27 @@
+# Render Blueprint — เว็บใบขออนุมัติสั่งซื้อ วิทยาลัยเทคนิคอุดรธานี
+# ใช้: Render Dashboard → New → Blueprint → เลือก repo นี้
+services:
+  - type: web
+    name: udtc-quotation
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci && npm run build:render
+    startCommand: node server/index.mjs
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: VITE_GOOGLE_CLIENT_ID
+        sync: false
+      - key: VITE_ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false

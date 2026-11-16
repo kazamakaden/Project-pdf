@@ -18,3 +18,5 @@ install.done
 build.log
 build.done
 _thai_test.txt
+# Render build output
+server/api/

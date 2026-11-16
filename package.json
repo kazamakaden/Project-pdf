@@ -9,7 +9,10 @@
     "typecheck": "tsc --noEmit && tsc -p tsconfig.server.json --noEmit",
     "typecheck:api": "tsc -p tsconfig.server.json --noEmit",
     "preview": "vite preview",
-    "smoke": "node scripts/smoke-admin.mjs"
+    "smoke": "node scripts/smoke-admin.mjs",
+    "build:api": "esbuild netlify/functions/products.ts netlify/functions/personnel.ts netlify/functions/doc-number.ts --bundle --platform=node --format=cjs --target=node20 --outdir=server/api --out-extension:.js=.cjs --external:mongodb --log-level=warning",
+    "build:render": "npm run build && npm run build:api",
+    "start:render": "node server/index.mjs"
   },
   "dependencies": {
     "@animateicons/react": "^0.13.0",
@@ -24,7 +27,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwind-merge": "^3.7.0",
-    "zustand": "^5.1.0"
+    "zustand": "^5.1.0",
+    "express": "^4.21.2"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
@@ -35,6 +39,7 @@
     "postcss": "^8.5.32",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.9.3",
-    "vite": "^8.3.6"
+    "vite": "^8.3.6",
+    "esbuild": "^0.28.2"
   }
 }
