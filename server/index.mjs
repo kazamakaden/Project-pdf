@@ -32,6 +32,39 @@ function pickHandler(apiPath) {
   return productsApi;
 }
 
+/**
+ * ตรวจการเชื่อมต่อฐานข้อมูล (ใช้ชั่วคราวเมื่อเปิด Shell ไม่ได้)
+ * เปิด https://<service>.onrender.com/api/health/db แล้วอ่านผล
+ * รหัสผ่านถูกปิดไว้ ไม่แสดงออกมา
+ */
+app.get('/api/health/db', async (_req, res) => {
+  const uri = (process.env.MONGODB_URI || '').trim();
+  const masked = uri.replace(/\/\/([^:@/]+):([^@/]*)@/, '//$1:***@');
+  const shape = {
+    present: Boolean(uri),
+    scheme: uri.split(':')[0] || '',
+    hasSrv: uri.startsWith('mongodb+srv://'),
+    dbName: process.env.MONGODB_DB || '(default)',
+    uriLength: uri.length,
+    host: (uri.match(/@([^/?]+)/) || [])[1] || '',
+  };
+  if (!uri) {
+    return res.json({ ok: false, ...shape, error: 'ยังไม่ได้ตั้งค่า MONGODB_URI' });
+  }
+
+  try {
+    const { MongoClient } = require('mongodb');
+    const client = new MongoClient(uri, { serverSelectionTimeoutMS: 8000 });
+    await client.connect();
+    await client.db(process.env.MONGODB_DB || undefined).command({ ping: 1 });
+    const count = await client.db(process.env.MONGODB_DB || undefined).collection('products').countDocuments();
+    await client.close();
+    res.json({ ok: true, ...shape, products: count });
+  } catch (error) {
+    res.status(500).json({ ok: false, ...shape, error: String(error && error.message) });
+  }
+});
+
 app.all('/api/*', async (req, res) => {
   const handler = pickHandler(req.path.slice('/api'.length));
   const event = {
