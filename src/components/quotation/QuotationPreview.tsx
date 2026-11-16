@@ -4,10 +4,14 @@ import { docFontOption, useDocFontStore } from '@/store/docFont';
 import type { BasketItem } from '@/types/basket';
 import type { CustomerInfo, QuotationTotals } from '@/types/quotation';
 import { formatCurrency } from '@/utils/format';
+import { bahtText } from '@/utils/bahttext';
 
 /**
  * ใบประมาณการค่าใช้จ่าย — ลอกแบบจากไฟล์ Expense_Estimation_Form.xlsx
- * (แถบหัวเรื่องน้ำเงิน, หัวข้อ "ความสอดคล้องกับนโยบาย" 5 ข้อ, ตาราง 7 คอลัมน์, แถวรวมค่าวัสดุสีเหลือง)
+ * (หัวข้อ "ความสอดคล้องกับนโยบาย" 5 ข้อ, ตาราง 7 คอลัมน์, แถวรวมค่าวัสดุ)
+ *
+ * เอกสารพิมพ์ขาว-ดำล้วน: ใช้เฉพาะสีดำ (#000) กับพื้นกระดาษสีขาว (#fff)
+ * ไม่มีพื้นสี/ตัวอักษรสีอื่นเลย เพื่อให้พิมพ์เครื่องเลเซอร์ขาว-ดำแล้วอ่านชัดเหมือนต้นฉบับ
  *
  * พิกัดทั้งหมดเป็น pixel ที่ 96dpi: 794 x 1120 px = A4 (210 x 297 mm)
  * จึงพิมพ์ออกกระดาษได้สัดส่วน 1:1 และ html2canvas จับภาพได้ตรงตามที่เห็นบนจอ
@@ -32,9 +36,8 @@ const ROWS_PER_PAGE = 20;
 const MIN_ROWS = ROWS_PER_PAGE;
 const ROW_HEIGHT = 30;
 
-const NAVY = '#1F4E79';
-const HEADER_BLUE = '#2F5597';
-const TOTAL_BG = '#FFF2CC';
+/** พื้นกระดาษ (ขาวล้วน) — เอกสารต้องมีแค่ดำ/ขาว */
+const PAPER = '#FFFFFF';
 const INK = '#000000';
 
 /** ตัวเลือกในหัวข้อ "ความสอดคล้องกับนโยบาย" (ข้อความตรงกับไฟล์ Expense_Estimation_Form.xlsx) */
@@ -73,9 +76,9 @@ function headerCell(scale: number): CSSProperties {
     ...baseCell(scale),
     justifyContent: 'center',
     textAlign: 'center',
-    color: '#FFFFFF',
-    backgroundColor: HEADER_BLUE,
-    fontWeight: 600,
+    color: INK,
+    backgroundColor: PAPER,
+    fontWeight: 700,
     fontSize: 13 * scale,
     padding: '2px 4px',
   };
@@ -86,7 +89,7 @@ const lastCell: CSSProperties = { borderRight: 'none' };
 function totalCell(scale: number): CSSProperties {
   return {
     ...baseCell(scale),
-    backgroundColor: TOTAL_BG,
+    backgroundColor: PAPER,
     fontWeight: 700,
     justifyContent: 'flex-end',
     fontSize: 13.5 * scale,
@@ -110,9 +113,10 @@ function TableHeader({ scale }: { scale: number }) {
           boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
-          backgroundColor: HEADER_BLUE,
-          color: '#FFFFFF',
+          backgroundColor: PAPER,
+          color: INK,
           borderRight: `1px solid ${INK}`,
+          borderBottom: `1px solid ${INK}`,
           minWidth: 0,
         }}
       >
@@ -129,7 +133,7 @@ function TableHeader({ scale }: { scale: number }) {
             textAlign: 'center',
             fontSize: 12.5 * scale,
             lineHeight: `${Math.ceil(15 * scale)}px`,
-            fontWeight: 600,
+            fontWeight: 700,
             padding: '2px 4px 0',
           }}
         >
@@ -207,8 +211,6 @@ interface PageProps {
   isFirst: boolean;
   scale: number;
   fontFamily: string;
-  /** เลขที่เอกสาร เช่น PR-2569-1110-001 */
-  docCode: string;
   /** วันที่ไทย เช่น 10 พฤศจิกายน 2569 */
   docDate: string;
 }
@@ -223,7 +225,6 @@ function QuotationPage({
   isFirst,
   scale,
   fontFamily,
-  docCode,
   docDate,
 }: PageProps) {
   const cell = baseCell(scale);
@@ -237,21 +238,22 @@ function QuotationPage({
         width: PAGE_WIDTH,
         minHeight: PAGE_HEIGHT,
         boxSizing: 'border-box',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: PAPER,
         color: INK,
         fontFamily,
-        padding: `26px ${PAD_X}px 24px`,
+        padding: `24px ${PAD_X}px 16px`,
         ...(isFirst
           ? null
           : { pageBreakBefore: 'always' as const, breakBefore: 'page' as const }),
       }}
     >
-      {/* แถบหัวเรื่อง (A1:G1) */}
+      {/* แถบหัวเรื่อง (A1:G1) — ขาว-ดำ: กรอบดำ ตัวอักษรดำ */}
       <div
         style={{
-          height: 52,
-          backgroundColor: NAVY,
-          color: '#FFFFFF',
+          height: 46,
+          backgroundColor: PAPER,
+          color: INK,
+          border: `1.5px solid ${INK}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -288,9 +290,6 @@ function QuotationPage({
         </div>
         <div style={{ textAlign: 'right', whiteSpace: 'nowrap', flex: '0 0 auto' }}>
           <div>
-            เลขที่ <span style={{ fontWeight: 600 }}>{docCode || '-'}</span>
-          </div>
-          <div>
             วันที่ <span style={{ fontWeight: 600 }}>{docDate || '-'}</span>
           </div>
         </div>
@@ -307,7 +306,7 @@ function QuotationPage({
             style={{
               display: 'grid',
               gridTemplateColumns: '345px 1fr',
-              minHeight: 30,
+              minHeight: 26,
               alignItems: 'center',
               fontSize: 13.5 * scale,
               lineHeight: 1.3,
@@ -329,10 +328,10 @@ function QuotationPage({
       <div
         className="quotation-table"
         style={{
-          marginTop: 12,
+          marginTop: 10,
           border: `1px solid ${INK}`,
           borderBottom: 'none',
-          backgroundColor: '#FFFFFF',
+          backgroundColor: PAPER,
         }}
       >
         <TableHeader scale={scale} />
@@ -383,14 +382,14 @@ function QuotationPage({
           </div>
         ))}
 
-        {/* แถวรวมค่าวัสดุ — แสดงเฉพาะหน้าสุดท้าย */}
+        {/* แถวรวมค่าวัสดุ + จำนวนเงินเป็นตัวอักษร — แสดงเฉพาะหน้าสุดท้าย */}
         {showTotal ? (
           <>
             <div
               style={{
                 ...rowStyle,
                 minHeight: 32,
-                borderBottom: showVat ? `1px solid ${INK}` : 'none',
+                borderBottom: `1px solid ${INK}`,
               }}
             >
               <div style={{ ...total, gridColumn: '1 / span 5' }}>รวมค่าวัสดุ</div>
@@ -400,25 +399,40 @@ function QuotationPage({
 
             {/* แสดง VAT ให้ชัดเจน เพื่อให้ยอดในเอกสารบวกกันได้จริง */}
             {showVat ? (
-              <>
-                <div style={{ ...rowStyle, minHeight: 32, borderBottom: `1px solid ${INK}` }}>
-                  <div style={{ ...total, gridColumn: '1 / span 5' }}>ภาษีมูลค่าเพิ่ม 7%</div>
-                  <div style={{ ...total, gridColumn: '6' }}>{formatCurrency(totals.vat)}</div>
-                  <div style={{ ...total, gridColumn: '7', ...lastCell }} />
-                </div>
-                <div style={{ ...rowStyle, minHeight: 34, borderBottom: `3px double ${INK}` }}>
-                  <div style={{ ...total, gridColumn: '1 / span 5', fontSize: 14 * scale }}>
-                    รวมทั้งสิ้น
-                  </div>
-                  <div style={{ ...total, gridColumn: '6', fontSize: 14 * scale }}>
-                    {formatCurrency(totals.grandTotal)}
-                  </div>
-                  <div style={{ ...total, gridColumn: '7', ...lastCell }} />
-                </div>
-              </>
-            ) : (
-              <div style={{ height: 0, borderBottom: `3px double ${INK}` }} />
-            )}
+              <div style={{ ...rowStyle, minHeight: 30, borderBottom: `1px solid ${INK}` }}>
+                <div style={{ ...total, gridColumn: '1 / span 5' }}>ภาษีมูลค่าเพิ่ม 7%</div>
+                <div style={{ ...total, gridColumn: '6' }}>{formatCurrency(totals.vat)}</div>
+                <div style={{ ...total, gridColumn: '7', ...lastCell }} />
+              </div>
+            ) : null}
+
+            <div style={{ ...rowStyle, minHeight: 32, borderBottom: `1px solid ${INK}` }}>
+              <div style={{ ...total, gridColumn: '1 / span 5', fontSize: 14 * scale }}>
+                รวมทั้งสิ้น
+              </div>
+              <div style={{ ...total, gridColumn: '6', fontSize: 14 * scale }}>
+                {formatCurrency(totals.grandTotal)}
+              </div>
+              <div style={{ ...total, gridColumn: '7', ...lastCell }} />
+            </div>
+
+            {/* จำนวนเงินเป็นตัวอักษร เช่น "ห้าพันบาทถ้วน" */}
+            <div style={{ ...rowStyle, minHeight: 28, borderBottom: 'none' }}>
+              <div style={{ ...total, gridColumn: '1 / span 5', justifyContent: 'flex-start' }}>
+                รวมทั้งสิ้น (ตัวอักษร)
+              </div>
+              <div
+                style={{
+                  ...total,
+                  gridColumn: '6 / span 2',
+                  justifyContent: 'flex-start',
+                  ...lastCell,
+                }}
+              >
+                {bahtText(totals.grandTotal)}
+              </div>
+            </div>
+            <div style={{ height: 0, borderBottom: `3px double ${INK}` }} />
           </>
         ) : null}
       </div>
@@ -430,14 +444,12 @@ interface QuotationPreviewProps {
   customer: CustomerInfo;
   items: BasketItem[];
   totals: QuotationTotals;
-  /** เลขที่เอกสาร (แสดงทุกหน้า) */
-  docCode: string;
   /** วันที่ไทย (แสดงทุกหน้า) */
   docDate: string;
 }
 
 const QuotationPreview = forwardRef<HTMLDivElement, QuotationPreviewProps>(function QuotationPreview(
-  { customer, items, totals, docCode, docDate },
+  { customer, items, totals, docDate },
   ref,
 ) {
   const fontId = useDocFontStore((state) => state.font);
@@ -465,7 +477,6 @@ const QuotationPreview = forwardRef<HTMLDivElement, QuotationPreviewProps>(funct
           isFirst={pageIndex === 0}
           scale={scale}
           fontFamily={fontFamily}
-          docCode={docCode}
           docDate={docDate}
         />
       ))}

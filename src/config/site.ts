@@ -9,13 +9,13 @@ const envClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim() ?? '';
 export const SITE = {
   nameTh: 'วิทยาลัยเทคนิคอุดรธานี',
   nameEn: 'Udon Thani Technical College',
-  tagline: 'ระบบพัสดุสำนักงาน · ราคากลาง',
-  description: 'ระบบพัสดุสำนักงาน วิทยาลัยเทคนิคอุดรธานี',
+  tagline: 'ระบบพัสดุสำนักงาน · ราคากลางวัสดุสำนักงาน',
+  description: 'งานพัสดุ-ฝ่ายบริหารทรัพยากร',
   address: 'เลขที่ 3 ถนนวัฒนานุวงศ์ ตำบลหมากแข้ง อำเภอเมือง จังหวัดอุดรธานี 41000',
   phone: '042-221538',
   fax: '042-240031, 042-246038',
   email: 'webmaster@udontech.ac.th',
-  website: 'หน้างานพัสดุ วิทยาลัยเทคนิคอุดรธานี',
+  website: 'งานพัสดุ วิทยาลัยเทคนิคอุดรธานี',
   documentFooter: 'เอกสารฉบับนี้สร้างจากระบบพัสดุสำนักงานออนไลน์ · วิทยาลัยเทคนิคอุดรธานี',
 } as const;
 

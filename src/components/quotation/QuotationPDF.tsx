@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Download, FileText, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { QuotationForm } from '@/components/quotation/QuotationForm';
@@ -6,11 +6,11 @@ import { QuotationPreview } from '@/components/quotation/QuotationPreview';
 import { useBasketStore } from '@/store/basket';
 import { DOC_FONTS, docFontOption, useDocFontStore } from '@/store/docFont';
 import type { DocFontId } from '@/store/docFont';
-import { useDocNumberStore } from '@/store/docNumber';
 import { useUiStore } from '@/store/ui';
 import type { AppView } from '@/types/navigation';
 import type { CustomerInfo } from '@/types/quotation';
 import { computeTotals } from '@/utils/calc';
+import { bangkokTodayIso, thaiDateLabel } from '@/utils/thaiDate';
 import { formatCurrency } from '@/utils/format';
 
 interface QuotationPDFProps {
@@ -35,20 +35,8 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
   const setFont = useDocFontStore((state) => state.setFont);
   const fontOption = docFontOption(fontId);
 
-  const docCode = useDocNumberStore((state) => state.code);
-  const docDate = useDocNumberStore((state) => state.dateLabel);
-  const syncDocNumber = useDocNumberStore((state) => state.sync);
-
-  /** ลายนิ้วมือของตะกร้า — ใช้ตัดสินว่าเป็นใบเดิมหรือใบใหม่ */
-  const basketKey = useMemo(() => {
-    if (items.length === 0) return '';
-    const lines = items.map((item) => `${item.product.id}:${item.quantity}:${item.product.price}`);
-    return `${lines.join('|')}|vat:${includeVat ? 1 : 0}`;
-  }, [items, includeVat]);
-
-  useEffect(() => {
-    syncDocNumber(basketKey);
-  }, [basketKey, syncDocNumber]);
+  /** วันที่บนเอกสาร (เวลาไทย) — ไม่ต้องรอเลขที่เอกสารจากเซิร์ฟเวอร์แล้ว */
+  const docDate = useMemo(() => thaiDateLabel(bangkokTodayIso()), []);
 
   const previewRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -67,14 +55,11 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
       showToast('กรุณาเลือกสินค้าก่อนสร้างใบขออนุมัติสั่งซื้อ');
       return;
     }
-    if (!docCode) {
-      showToast('กำลังออกเลขที่เอกสาร กรุณารอสักครู่แล้วกดอีกครั้ง');
-      return;
-    }
     const element = previewRef.current;
     if (!element) return;
 
     setIsGenerating(true);
+    const fileName = buildFileName();
     try {
       /**
        * ต้องรอฟอนต์ของเอกสาร (TH Sarabun New หรือ Sarabun) โหลดครบก่อนจับภาพ
@@ -107,7 +92,7 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
 
       const options: PdfOptions = {
         margin: 0,
-        filename: buildFileName(),
+        filename: fileName,
         // JPEG คุณภาพสูงที่ 288 dpi: ตัวอักษรยังคมชัดเมื่อพิมพ์ แต่ไฟล์ไม่ใหญ่จนส่งอีเมลไม่ได้
         image: { type: 'jpeg', quality: 0.95 },
         html2canvas: {
@@ -125,7 +110,22 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
         },
       };
 
-      await html2pdf().set(options).from(element).save();
+      /**
+       * html2pdf มักต่อหน้าเปล่าเกินมา 1 หน้าเมื่อความสูงของฟอร์มชนขอบ A4 พอดี
+       * จึงสร้าง PDF ก่อน แล้วตัดหน้าที่เกินจำนวนที่ควรมี (20 แถว/หน้า) ทิ้งก่อนบันทึก
+       */
+      interface PdfDocument {
+        internal: { getNumberOfPages: () => number };
+        deletePage: (pageNumber: number) => void;
+        save: (fileName: string) => void;
+      }
+
+      const expectedPages = Math.max(1, Math.ceil(items.length / 20));
+      const pdf = (await html2pdf().set(options).from(element).toPdf().get('pdf')) as PdfDocument;
+      while (pdf.internal.getNumberOfPages() > expectedPages) {
+        pdf.deletePage(pdf.internal.getNumberOfPages());
+      }
+      pdf.save(fileName);
       showToast('ดาวน์โหลดใบขออนุมัติสั่งซื้อเรียบร้อย');
     } catch (error) {
       console.error(error);
@@ -192,7 +192,6 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
             customer={customer}
             items={items}
             totals={totals}
-            docCode={docCode}
             docDate={docDate}
           />
         </div>
