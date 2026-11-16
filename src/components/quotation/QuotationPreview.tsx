@@ -418,7 +418,9 @@ function QuotationPage({
             </div>
 
             {/* จำนวนเงินเป็นตัวอักษร เช่น "ห้าพันบาทถ้วน" — เส้นปิดท้ายตาราง (double) อยู่ที่แถวนี้ */}
-            <div style={{ ...rowStyle, minHeight: 34, borderBottom: `3px double ${INK}` }}>
+            <div
+              style={{ ...rowStyle, height: 40, minHeight: 40, borderBottom: `3px double ${INK}` }}
+            >
               {/* ช่องเดียวทั้งแถว: ป้ายกับจำนวนเงินเป็นตัวอักษรอยู่ด้วยกัน ไม่มีเส้นคั่นกลาง */}
               <div
                 style={{
@@ -426,11 +428,15 @@ function QuotationPage({
                   gridColumn: '1 / span 7',
                   justifyContent: 'flex-start',
                   gap: 8,
+                  lineHeight: '34px',
+                  overflow: 'visible',
                   ...lastCell,
                 }}
               >
-                <span>รวมทั้งสิ้น (ตัวอักษร)</span>
-                <span>{bahtText(totals.grandTotal)}</span>
+                {/* ชดเชยระยะ ascent ของฟอนต์ไทยที่ html2canvas วาดต่ำกว่าปกติ */}
+                <span style={{ display: 'block', marginTop: -9 * scale }}>
+                  รวมทั้งสิ้น (ตัวอักษร) {bahtText(totals.grandTotal)}
+                </span>
               </div>
             </div>
           </>

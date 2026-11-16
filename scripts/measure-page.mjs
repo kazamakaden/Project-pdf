@@ -142,6 +142,25 @@ try {
   })()`);
   console.log('ROWS', JSON.stringify(dump, null, 1));
 
+  const pages = await evalJs(`(() => {
+    const tables = Array.from(document.querySelectorAll('.quotation-table'));
+    return tables.map((t, i) => {
+      const page = t.parentElement;
+      const rows = Array.from(t.children);
+      const last = rows[rows.length - 1];
+      const pr = page.getBoundingClientRect();
+      return {
+        page: i + 1,
+        pageTop: Math.round(pr.top),
+        pageHeight: Math.round(pr.height),
+        tableH: Math.round(t.getBoundingClientRect().height),
+        lastRow: { h: Math.round(last.getBoundingClientRect().height), text: (last.innerText||'').slice(0,30) },
+        tableBottomInPage: Math.round(t.getBoundingClientRect().bottom - pr.top),
+      };
+    });
+  })()`);
+  console.log('PAGES', JSON.stringify(pages));
+
   const info = await evalJs(`(() => {
     const table = document.querySelector('.quotation-table');
     const page = table ? table.parentElement : null;
