@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
-import { Download, FileText, Loader2 } from 'lucide-react';
+import type { UIEvent } from 'react';
+import { ChevronLeft, ChevronRight, Download, FileText, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { QuotationForm } from '@/components/quotation/QuotationForm';
 import { QuotationPreview } from '@/components/quotation/QuotationPreview';
@@ -36,13 +37,33 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
 
 
   const previewRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const [customer, setCustomer] = useState<CustomerInfo>({
     requesterName: '',
     department: '',
   });
 
   const totals = computeTotals(items, includeVat);
+
+  /** จำนวนหน้าของฟอร์ม (20 รายการ/หน้า) — ใช้กับปุ่มเลื่อนหน้าในตัวอย่างเอกสาร */
+  const pageCount = Math.max(1, Math.ceil(items.length / 20));
+  const pageSafe = Math.min(currentPage, pageCount);
+
+  const goToPage = (target: number) => {
+    const page = Math.min(Math.max(target, 1), pageCount);
+    setCurrentPage(page);
+    const node = previewRef.current?.children[page - 1] as HTMLElement | undefined;
+    node?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handlePreviewScroll = (event: UIEvent<HTMLDivElement>) => {
+    const el = event.currentTarget;
+    const index = Math.floor(el.scrollTop / 1120) + 1;
+    const next = Math.min(Math.max(index, 1), pageCount);
+    if (next !== currentPage) setCurrentPage(next);
+  };
 
   const updateCustomer = (patch: Partial<CustomerInfo>) =>
     setCustomer((previous) => ({ ...previous, ...patch }));
@@ -183,13 +204,51 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
           </div>
         </div>
 
-        <div className="overflow-x-auto rounded-lg bg-slate-200 p-4 dark:bg-slate-800">
-          <QuotationPreview
-            ref={previewRef}
-            customer={customer}
-            items={items}
-            totals={totals}
-          />
+        <div className="rounded-lg bg-slate-200 p-4 dark:bg-slate-800">
+          {/* แถบเลื่อนหน้าเอกสาร — กันดูตัวอย่างแล้วนึกว่าเอกสารขาด */}
+          {pageCount > 1 && (
+            <div className="mb-3 flex items-center justify-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                aria-label="หน้าก่อนหน้า"
+                disabled={pageSafe <= 1}
+                onClick={() => goToPage(pageSafe - 1)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="min-w-[7rem] text-center text-sm font-medium text-slate-700 dark:text-slate-200">
+                หน้า {pageSafe} / {pageCount}
+              </span>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                aria-label="หน้าถัดไป"
+                disabled={pageSafe >= pageCount}
+                onClick={() => goToPage(pageSafe + 1)}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+          <div
+            ref={scrollRef}
+            onScroll={handlePreviewScroll}
+            className={
+              isGenerating
+                ? 'overflow-x-auto'
+                : 'max-h-[80vh] overflow-auto rounded-md shadow-inner'
+            }
+          >
+            <QuotationPreview
+              ref={previewRef}
+              customer={customer}
+              items={items}
+              totals={totals}
+            />
+          </div>
         </div>
       </div>
     </section>
