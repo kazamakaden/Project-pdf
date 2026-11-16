@@ -91,10 +91,10 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
         margin: 0,
         filename: fileName,
         // JPEG คุณภาพสูงที่ 288 dpi: ตัวอักษรยังคมชัดเมื่อพิมพ์ แต่ไฟล์ไม่ใหญ่จนส่งอีเมลไม่ได้
-        image: { type: 'jpeg', quality: 0.95 },
+        image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
           // 3 เท่า = ประมาณ 288 dpi เมื่อพิมพ์ A4 (ความละเอียดที่เครื่องพิมพ์ออฟฟิศอ่านออกสบาย)
-          scale: 3,
+          scale: 4,
           useCORS: true,
           backgroundColor: '#ffffff',
           logging: false,

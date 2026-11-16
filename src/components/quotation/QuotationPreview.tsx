@@ -57,7 +57,8 @@ const POLICY_ITEMS: Array<{ label: string; suffix: string; options: number }> = 
 const rowStyle: CSSProperties = {
   display: 'grid',
   gridTemplateColumns: COL_TEMPLATE,
-  borderBottom: `1px solid ${INK}`,
+  overflow: 'hidden',
+  borderBottom: `1.5px solid ${INK}`,
   pageBreakInside: 'avoid',
   breakInside: 'avoid',
 };
@@ -71,8 +72,10 @@ function baseCell(scale: number): CSSProperties {
     fontSize: 13 * scale,
     lineHeight: 1.25,
     minWidth: 0,
-    borderRight: `1px solid ${INK}`,
-    wordBreak: 'break-word',
+    borderRight: `1.5px solid ${INK}`,
+    // ภาษาไทยไม่มีช่องว่าง: ต้องให้ตัดคำได้ทุกจุด ไม่งั้นความกว้างขั้นต่ำของช่อง
+    // จะดันตารางล้นออกนอกกรอบขวา ทำให้เส้นขอบขวาหายตอนพิมพ์
+    overflowWrap: 'anywhere',
   };
 }
 
@@ -106,7 +109,7 @@ function TableHeader({ scale }: { scale: number }) {
   const cell = headerCell(scale);
 
   return (
-    <div style={{ ...rowStyle, minHeight: 68, borderBottom: `1px solid ${INK}` }}>
+    <div style={{ ...rowStyle, minHeight: 68, borderBottom: `1.5px solid ${INK}` }}>
       <div style={{ ...cell, gridColumn: '1' }}>ลำดับที่</div>
       <div style={{ ...cell, gridColumn: '2' }}>รายการ</div>
       <div style={{ ...cell, gridColumn: '3' }}>จำนวน</div>
@@ -120,8 +123,8 @@ function TableHeader({ scale }: { scale: number }) {
           flexDirection: 'column',
           backgroundColor: PAPER,
           color: INK,
-          borderRight: `1px solid ${INK}`,
-          borderBottom: `1px solid ${INK}`,
+          borderRight: `1.5px solid ${INK}`,
+          borderBottom: `1.5px solid ${INK}`,
           minWidth: 0,
         }}
       >
@@ -158,8 +161,8 @@ function TableHeader({ scale }: { scale: number }) {
           <div
             style={{
               ...cell,
-              borderRight: `1px solid ${INK}`,
-              borderTop: `1px solid ${INK}`,
+              borderRight: `1.5px solid ${INK}`,
+              borderTop: `1.5px solid ${INK}`,
               borderBottom: 'none',
               justifyContent: 'center',
             }}
@@ -170,7 +173,7 @@ function TableHeader({ scale }: { scale: number }) {
             style={{
               ...cell,
               borderRight: 'none',
-              borderTop: `1px solid ${INK}`,
+              borderTop: `1.5px solid ${INK}`,
               borderBottom: 'none',
             }}
           >
@@ -326,7 +329,7 @@ function QuotationPage({
         className="quotation-table"
         style={{
           marginTop: 10,
-          border: `1px solid ${INK}`,
+          border: `1.5px solid ${INK}`,
           borderBottom: 'none',
           backgroundColor: PAPER,
         }}
@@ -386,7 +389,7 @@ function QuotationPage({
               style={{
                 ...rowStyle,
                 minHeight: 32,
-                borderBottom: `1px solid ${INK}`,
+                borderBottom: `1.5px solid ${INK}`,
               }}
             >
               <div style={{ ...total, gridColumn: '1 / span 5' }}>รวมค่าวัสดุ</div>
@@ -396,14 +399,14 @@ function QuotationPage({
 
             {/* แสดง VAT ให้ชัดเจน เพื่อให้ยอดในเอกสารบวกกันได้จริง */}
             {showVat ? (
-              <div style={{ ...rowStyle, minHeight: 30, borderBottom: `1px solid ${INK}` }}>
+              <div style={{ ...rowStyle, minHeight: 30, borderBottom: `1.5px solid ${INK}` }}>
                 <div style={{ ...total, gridColumn: '1 / span 5' }}>ภาษีมูลค่าเพิ่ม 7%</div>
                 <div style={{ ...total, gridColumn: '6' }}>{formatCurrency(totals.vat)}</div>
                 <div style={{ ...total, gridColumn: '7', ...lastCell }} />
               </div>
             ) : null}
 
-            <div style={{ ...rowStyle, minHeight: 32, borderBottom: `1px solid ${INK}` }}>
+            <div style={{ ...rowStyle, minHeight: 32, borderBottom: `1.5px solid ${INK}` }}>
               <div style={{ ...total, gridColumn: '1 / span 5', fontSize: 14 * scale }}>
                 รวมทั้งสิ้น
               </div>
@@ -415,18 +418,18 @@ function QuotationPage({
 
             {/* จำนวนเงินเป็นตัวอักษร เช่น "ห้าพันบาทถ้วน" — เส้นปิดท้ายตาราง (double) อยู่ที่แถวนี้ */}
             <div style={{ ...rowStyle, minHeight: 34, borderBottom: `3px double ${INK}` }}>
-              <div style={{ ...total, gridColumn: '1 / span 3', justifyContent: 'flex-start' }}>
-                รวมทั้งสิ้น (ตัวอักษร)
-              </div>
+              {/* ช่องเดียวทั้งแถว: ป้ายกับจำนวนเงินเป็นตัวอักษรอยู่ด้วยกัน ไม่มีเส้นคั่นกลาง */}
               <div
                 style={{
                   ...total,
-                  gridColumn: '4 / span 4',
+                  gridColumn: '1 / span 7',
                   justifyContent: 'flex-start',
+                  gap: 8,
                   ...lastCell,
                 }}
               >
-                {bahtText(totals.grandTotal)}
+                <span>รวมทั้งสิ้น (ตัวอักษร)</span>
+                <span>{bahtText(totals.grandTotal)}</span>
               </div>
             </div>
           </>

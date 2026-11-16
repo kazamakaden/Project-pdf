@@ -126,6 +126,22 @@ try {
   await evalJs('document.fonts.ready.then(() => true)');
   await sleep(500);
 
+  const dump = await evalJs(`(() => {
+    const table = document.querySelector('.quotation-table');
+    const rows = Array.from(table.children).slice(-6);
+    return rows.map((r) => ({
+      text: (r.innerText || '').replace(/\n/g, ' ').slice(0, 40),
+      h: Math.round(r.getBoundingClientRect().height),
+      w: Math.round(r.getBoundingClientRect().width),
+      cells: Array.from(r.children).map((c) => {
+        const cs = getComputedStyle(c);
+        const r2 = c.getBoundingClientRect();
+        return { w: Math.round(r2.width), br: cs.borderRightWidth, bg: cs.backgroundColor, gc: cs.gridColumn };
+      }),
+    }));
+  })()`);
+  console.log('ROWS', JSON.stringify(dump, null, 1));
+
   const info = await evalJs(`(() => {
     const table = document.querySelector('.quotation-table');
     const page = table ? table.parentElement : null;
