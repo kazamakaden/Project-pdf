@@ -155,28 +155,45 @@ function TableHeader({ scale }: { scale: number }) {
             width: '100%',
             height: 34,
             flex: '0 0 auto',
+            marginTop: 'auto',
           }}
         >
           <div
             style={{
-              ...cell,
+              display: 'block',
+              textAlign: 'center',
+              lineHeight: '32px',
+              fontSize: 13 * scale,
+              fontWeight: 700,
+              color: INK,
+              backgroundColor: PAPER,
+              height: 34,
+              boxSizing: 'border-box',
               borderRight: `1.5px solid ${INK}`,
               borderTop: `1.5px solid ${INK}`,
               borderBottom: 'none',
-              justifyContent: 'center',
+              overflowWrap: 'anywhere',
+              minWidth: 0,
             }}
           >
             ราคา/หน่วย
           </div>
           <div
             style={{
-              ...cell,
-              paddingTop: 0,
-              paddingBottom: 18,
+              display: 'block',
+              textAlign: 'center',
+              lineHeight: '32px',
+              fontSize: 13 * scale,
+              fontWeight: 700,
+              color: INK,
+              backgroundColor: PAPER,
+              height: 34,
               boxSizing: 'border-box',
               borderRight: 'none',
               borderTop: `1.5px solid ${INK}`,
               borderBottom: 'none',
+              overflowWrap: 'anywhere',
+              minWidth: 0,
             }}
           >
             รวมเงิน
