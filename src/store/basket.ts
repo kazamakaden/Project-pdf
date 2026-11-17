@@ -22,7 +22,7 @@ export const useBasketStore = create<BasketState>()(
   persist(
     (set) => ({
       items: [],
-      includeVat: true,
+      includeVat: false,
       isDrawerOpen: false,
       addItem: (product, quantity = 1) =>
         set((state) => {

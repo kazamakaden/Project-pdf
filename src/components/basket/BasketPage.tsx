@@ -1,6 +1,5 @@
 import { ArrowRight, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useBasketStore } from '@/store/basket';
 import type { AppView } from '@/types/navigation';
@@ -17,10 +16,9 @@ export function BasketPage({ onNavigate }: BasketPageProps) {
   const decrement = useBasketStore((state) => state.decrement);
   const removeItem = useBasketStore((state) => state.removeItem);
   const clearBasket = useBasketStore((state) => state.clearBasket);
-  const includeVat = useBasketStore((state) => state.includeVat);
   const setIncludeVat = useBasketStore((state) => state.setIncludeVat);
 
-  const totals = computeTotals(items, includeVat);
+  const totals = computeTotals(items, false);
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -105,13 +103,6 @@ export function BasketPage({ onNavigate }: BasketPageProps) {
               <div className="flex justify-between">
                 <span>ยอดรวมสินค้า</span>
                 <span>฿{formatCurrency(totals.subtotal)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <Switch checked={includeVat} onCheckedChange={setIncludeVat} aria-label="เปิด/ปิด VAT" />
-                  VAT 7%
-                </span>
-                <span>฿{formatCurrency(totals.vat)}</span>
               </div>
               <div className="flex justify-between border-t border-slate-200 pt-2 text-base font-bold text-royal dark:border-slate-700 dark:text-blue-300">
                 <span>รวมทั้งสิ้น</span>

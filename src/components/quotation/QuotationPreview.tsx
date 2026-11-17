@@ -237,7 +237,6 @@ function QuotationPage({
   const cell = baseCell(scale);
   const total = totalCell(scale);
   const blankRows = showTotal ? Math.max(0, MIN_ROWS - items.length) : 0;
-  const showVat = totals.includeVat && totals.vat > 0;
 
   return (
     <div
@@ -403,15 +402,6 @@ function QuotationPage({
               <div style={{ ...total, gridColumn: '6' }}>{formatCurrency(totals.subtotal)}</div>
               <div style={{ ...total, gridColumn: '7', ...lastCell }} />
             </div>
-
-            {/* แสดง VAT ให้ชัดเจน เพื่อให้ยอดในเอกสารบวกกันได้จริง */}
-            {showVat ? (
-              <div style={{ ...rowStyle, minHeight: 30, borderBottom: `1.5px solid ${INK}` }}>
-                <div style={{ ...total, gridColumn: '1 / span 5' }}>ภาษีมูลค่าเพิ่ม 7%</div>
-                <div style={{ ...total, gridColumn: '6' }}>{formatCurrency(totals.vat)}</div>
-                <div style={{ ...total, gridColumn: '7', ...lastCell }} />
-              </div>
-            ) : null}
 
             <div style={{ ...rowStyle, minHeight: 32, borderBottom: `1.5px solid ${INK}` }}>
               <div style={{ ...total, gridColumn: '1 / span 5', fontSize: 14 * scale }}>

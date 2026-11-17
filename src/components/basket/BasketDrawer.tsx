@@ -18,9 +18,8 @@ export function BasketDrawer({ onNavigate }: BasketDrawerProps) {
   const increment = useBasketStore((state) => state.increment);
   const decrement = useBasketStore((state) => state.decrement);
   const removeItem = useBasketStore((state) => state.removeItem);
-  const includeVat = useBasketStore((state) => state.includeVat);
 
-  const totals = computeTotals(items, includeVat);
+  const totals = computeTotals(items, false);
 
   const goTo = (view: AppView) => {
     setDrawerOpen(false);
@@ -111,12 +110,6 @@ export function BasketDrawer({ onNavigate }: BasketDrawerProps) {
                 <span>ยอดรวม</span>
                 <span>฿{formatCurrency(totals.subtotal)}</span>
               </div>
-              {includeVat && (
-                <div className="flex justify-between">
-                  <span>VAT 7%</span>
-                  <span>฿{formatCurrency(totals.vat)}</span>
-                </div>
-              )}
               <div className="flex justify-between text-base font-bold text-royal dark:text-blue-300">
                 <span>รวมทั้งสิ้น</span>
                 <span>฿{formatCurrency(totals.grandTotal)}</span>

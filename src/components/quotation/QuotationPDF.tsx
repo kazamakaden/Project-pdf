@@ -45,7 +45,7 @@ export function QuotationPDF({ onNavigate }: QuotationPDFProps) {
     department: '',
   });
 
-  const totals = computeTotals(items, includeVat);
+  const totals = computeTotals(items, false);
 
   /** จำนวนหน้าของฟอร์ม (20 รายการ/หน้า) — ใช้กับปุ่มเลื่อนหน้าในตัวอย่างเอกสาร */
   const pageCount = Math.max(1, Math.ceil(items.length / 20));
