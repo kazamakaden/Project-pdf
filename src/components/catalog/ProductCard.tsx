@@ -6,6 +6,7 @@ import { useBasketStore } from '@/store/basket';
 import { useUiStore } from '@/store/ui';
 import type { Product } from '@/types/product';
 import { formatCurrency } from '@/utils/format';
+import { prettyThaiText } from '@/utils/text';
 
 interface ProductCardProps {
   product: Product;
@@ -21,7 +22,6 @@ export function ProductCard({ product }: ProductCardProps) {
   const [qty, setQty] = useState(1);
 
   const onRequest = product.price <= 0;
-  const meta = [product.size, product.model].filter(Boolean).join(' · ');
   const quantity = Number.isFinite(qty) && qty > 0 ? Math.floor(qty) : 1;
 
   const handleAdd = () => {
@@ -39,15 +39,34 @@ export function ProductCard({ product }: ProductCardProps) {
         <span className="text-xs text-slate-400">#{String(product.seq).padStart(3, '0')}</span>
       </div>
 
-      <h3 className="text-sm font-semibold leading-snug text-slate-900 dark:text-slate-100">
-        {product.name}
+      <h3 className="text-base font-semibold leading-relaxed break-words text-slate-900 dark:text-slate-100">
+        {prettyThaiText(product.name)}
       </h3>
-      {meta && <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{meta}</p>}
 
-      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
-        {product.brand && <span>ยี่ห้อ: {product.brand}</span>}
-        <span>หน่วย: {product.unit}</span>
-      </div>
+      <dl className="mt-2 space-y-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+        {product.size && (
+          <div className="flex gap-1">
+            <dt className="shrink-0 text-slate-400">ขนาด</dt>
+            <dd className="break-words">{prettyThaiText(product.size)}</dd>
+          </div>
+        )}
+        {product.model && (
+          <div className="flex gap-1">
+            <dt className="shrink-0 text-slate-400">รุ่น</dt>
+            <dd className="break-words">{prettyThaiText(product.model)}</dd>
+          </div>
+        )}
+        {product.brand && (
+          <div className="flex gap-1">
+            <dt className="shrink-0 text-slate-400">ยี่ห้อ</dt>
+            <dd className="break-words">{prettyThaiText(product.brand)}</dd>
+          </div>
+        )}
+        <div className="flex gap-1">
+          <dt className="shrink-0 text-slate-400">หน่วย</dt>
+          <dd>{prettyThaiText(product.unit)}</dd>
+        </div>
+      </dl>
 
       {product.note && <p className="mt-1 text-xs italic text-accent-hover">{product.note}</p>}
 

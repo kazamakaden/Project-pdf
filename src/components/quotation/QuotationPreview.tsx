@@ -5,6 +5,7 @@ import type { BasketItem } from '@/types/basket';
 import type { CustomerInfo, QuotationTotals } from '@/types/quotation';
 import { formatCurrency } from '@/utils/format';
 import { bahtText } from '@/utils/bahttext';
+import { prettyThaiText } from '@/utils/text';
 
 /**
  * ใบประมาณการค่าใช้จ่าย — ลอกแบบจากไฟล์ Expense_Estimation_Form.xlsx
@@ -367,7 +368,7 @@ function QuotationPage({
           return (
             <div key={item.product.id} style={{ ...rowStyle, minHeight: ROW_HEIGHT }}>
               <div style={{ ...cell, justifyContent: 'center' }}>{startIndex + index + 1}</div>
-              <div style={cell}>{item.product.name}</div>
+              <div style={cell}>{prettyThaiText(item.product.name)}</div>
               <div style={{ ...cell, justifyContent: 'center' }}>{item.quantity}</div>
               <div style={{ ...cell, justifyContent: 'center' }}>{item.product.unit}</div>
               <div style={{ ...cell, justifyContent: 'flex-end' }}>
