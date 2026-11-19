@@ -46,7 +46,7 @@ export function ProductCatalog() {
     <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       <div className="mb-6 flex flex-col gap-1">
         <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">
-          แคตตาล็อกวัสดุสำนักงาน
+          รายการวัสดุสำนักงาน
         </h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">
           สินค้าทั้งหมด {catalog.length} รายการ เลือกหยิบใส่ตะกร้าเพื่อสร้างใบขออนุมัติสั่งซื้อ

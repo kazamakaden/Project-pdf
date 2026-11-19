@@ -55,7 +55,7 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'catalog', label: 'แคตตาล็อก', icon: StoreIcon },
+  { id: 'catalog', label: 'รายการ', icon: StoreIcon },
   { id: 'basket', label: 'ตะกร้าสินค้า', icon: ShoppingCartIcon },
   { id: 'quotation', label: 'ใบขออนุมัติสั่งซื้อ', icon: FileTextIcon },
   { id: 'personnel', label: 'ทำเนียบบุคลากร', icon: UsersIcon },

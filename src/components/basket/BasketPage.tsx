@@ -42,10 +42,10 @@ export function BasketPage({ onNavigate }: BasketPageProps) {
           <div>
             <p className="font-medium text-slate-700 dark:text-slate-200">ยังไม่มีสินค้าในตะกร้า</p>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              เริ่มเลือกสินค้าจากแคตตาล็อกได้เลย
+              เริ่มเลือกสินค้าจากรายการได้เลย
             </p>
           </div>
-          <Button onClick={() => onNavigate('catalog')}>ไปที่แคตตาล็อก</Button>
+          <Button onClick={() => onNavigate('catalog')}>ไปที่รายการ</Button>
         </div>
       ) : (
         <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">

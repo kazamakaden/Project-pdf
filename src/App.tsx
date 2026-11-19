@@ -15,7 +15,7 @@ import type { AppView } from '@/types/navigation';
 export default function App() {
   const [view, setView] = useState<AppView>('catalog');
 
-  // โหลดแคตตาล็อกจาก API ครั้งแรกที่เปิดเว็บ
+  // โหลดรายการจาก API ครั้งแรกที่เปิดเว็บ
   useEffect(() => {
     void useProductStore.getState().load();
     void usePersonnelStore.getState().load();

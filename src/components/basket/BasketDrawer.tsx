@@ -46,9 +46,9 @@ export function BasketDrawer({ onNavigate }: BasketDrawerProps) {
           {items.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-16 text-center text-slate-500 dark:text-slate-400">
               <ShoppingBag className="h-10 w-10 text-slate-300 dark:text-slate-600" />
-              <p className="text-sm">เลือกสินค้าจากแคตตาล็อกเพื่อเริ่มต้น</p>
+              <p className="text-sm">เลือกสินค้าจากรายการเพื่อเริ่มต้น</p>
               <Button size="sm" onClick={() => goTo('catalog')}>
-                ไปที่แคตตาล็อก
+                ไปที่รายการ
               </Button>
             </div>
           ) : (

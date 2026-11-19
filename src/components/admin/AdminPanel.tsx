@@ -104,7 +104,7 @@ export function AdminPanel({ onNavigate }: AdminPanelProps) {
   };
 
   const handleDelete = async (product: Product) => {
-    const confirmed = window.confirm('ต้องการลบ "' + product.name + '" ออกจากแคตตาล็อกหรือไม่?');
+    const confirmed = window.confirm('ต้องการลบ "' + product.name + '" ออกจากรายการหรือไม่?');
     if (!confirmed) return;
     try {
       await deleteProduct(product.id);
@@ -148,7 +148,7 @@ export function AdminPanel({ onNavigate }: AdminPanelProps) {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button type="button" variant="outline" size="sm" onClick={() => onNavigate('catalog')}>
-            กลับแคตตาล็อก
+            กลับรายการ
           </Button>
           <Button
             type="button"
