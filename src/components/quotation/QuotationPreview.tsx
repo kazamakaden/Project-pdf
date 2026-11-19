@@ -189,7 +189,8 @@ function TableHeader({ scale }: { scale: number }) {
               backgroundColor: PAPER,
               height: 34,
               boxSizing: 'border-box',
-              borderRight: 'none',
+              borderLeft: `1.5px solid ${INK}`,
+              borderRight: `1.5px solid ${INK}`,
               borderTop: `1.5px solid ${INK}`,
               borderBottom: 'none',
               overflowWrap: 'anywhere',
@@ -415,8 +416,19 @@ function QuotationPage({
                 borderBottom: `1.5px solid ${INK}`,
               }}
             >
-              <div style={{ ...total, gridColumn: '1 / span 5' }}>รวมค่าวัสดุ</div>
-              <div style={{ ...total, gridColumn: '6' }}>{formatCurrency(totals.subtotal)}</div>
+              <div style={{ ...total, gridColumn: '1 / span 5', borderTop: `1.5px solid ${INK}` }}>
+                รวมค่าวัสดุ
+              </div>
+              <div
+                style={{
+                  ...total,
+                  gridColumn: '6',
+                  borderLeft: `1.5px solid ${INK}`,
+                  borderTop: `1.5px solid ${INK}`,
+                }}
+              >
+                {formatCurrency(totals.subtotal)}
+              </div>
               <div style={{ ...total, gridColumn: '7', ...lastCell }} />
             </div>
 
@@ -424,7 +436,14 @@ function QuotationPage({
               <div style={{ ...total, gridColumn: '1 / span 5', fontSize: 14 * scale }}>
                 รวมทั้งสิ้น
               </div>
-              <div style={{ ...total, gridColumn: '6', fontSize: 14 * scale }}>
+              <div
+                style={{
+                  ...total,
+                  gridColumn: '6',
+                  fontSize: 14 * scale,
+                  borderLeft: `1.5px solid ${INK}`,
+                }}
+              >
                 {formatCurrency(totals.grandTotal)}
               </div>
               <div style={{ ...total, gridColumn: '7', ...lastCell }} />
