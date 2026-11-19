@@ -6,27 +6,40 @@ import { useBasketStore } from '@/store/basket';
 import { useUiStore } from '@/store/ui';
 import type { Product } from '@/types/product';
 import { formatCurrency } from '@/utils/format';
-import { prettyThaiText } from '@/utils/text';
+import { baseNameOf, prettyThaiText } from '@/utils/text';
 
 interface ProductCardProps {
-  product: Product;
+  /** สินค้าตระกูลเดียวกัน (ต่างขนาด/รุ่น) — ตัวแรกคือค่าเริ่มต้น */
+  variants: Product[];
 }
 
 /**
- * การ์ดสินค้าแบบข้อความล้วน — ไม่มีรูปภาพ ตามคำสั่ง Kamin (ลูกค้าไม่ต้องการรูป)
- * และใส่จำนวนได้เองก่อนกด "เพิ่ม" เพื่อลดการกดซ้ำทีละชิ้น
+ * การ์ดสินค้าแบบข้อความล้วน — ไม่มีรูปภาพ
+ * ถ้าสินค้าตระกูลเดียวกันมีหลายขนาด (เช่น กรรไกร 6/7/8 นิ้ว) จะรวมเป็นการ์ดเดียว
+ * และให้เลือกขนาดจากรายการ เพื่อไม่ให้ขนาดไปปนอยู่ในชื่อ
  */
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ variants }: ProductCardProps) {
   const addItem = useBasketStore((state) => state.addItem);
   const showToast = useUiStore((state) => state.showToast);
+  const [selectedId, setSelectedId] = useState(variants[0]?.id ?? '');
   const [qty, setQty] = useState(1);
 
+  const product = variants.find((v) => v.id === selectedId) ?? variants[0];
+  if (!product) return null;
+
+  const hasChoices = variants.length > 1;
   const onRequest = product.price <= 0;
+  const baseName = baseNameOf(product.name, product.size);
   const quantity = Number.isFinite(qty) && qty > 0 ? Math.floor(qty) : 1;
+
+  const optionLabel = (v: Product) => {
+    const bits = [v.size, v.model, v.brand].map((x) => prettyThaiText(x)).filter(Boolean);
+    return bits.length ? bits.join(' · ') : prettyThaiText(v.name);
+  };
 
   const handleAdd = () => {
     addItem(product, quantity);
-    showToast('เพิ่ม "' + product.name + '" จำนวน ' + quantity + ' ' + product.unit + ' ลงตะกร้าแล้ว');
+    showToast('เพิ่ม "' + prettyThaiText(product.name) + '" จำนวน ' + quantity + ' ' + product.unit + ' ลงตะกร้าแล้ว');
     setQty(1);
   };
 
@@ -40,35 +53,54 @@ export function ProductCard({ product }: ProductCardProps) {
       </div>
 
       <h3 className="text-base font-semibold leading-relaxed break-words text-slate-900 dark:text-slate-100">
-        {prettyThaiText(product.name)}
+        {baseName}
       </h3>
 
-      <dl className="mt-2 space-y-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
-        {product.size && (
-          <div className="flex gap-1">
-            <dt className="shrink-0 text-slate-400">ขนาด</dt>
-            <dd className="break-words">{prettyThaiText(product.size)}</dd>
+      <div className="mt-3 space-y-2 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+        {hasChoices ? (
+          <label className="block">
+            <span className="mb-1 block text-slate-400">เลือกขนาด / รุ่น ({variants.length} แบบ)</span>
+            <select
+              value={selectedId}
+              onChange={(event) => setSelectedId(event.target.value)}
+              className="w-full rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 focus:border-royal focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+            >
+              {variants.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {optionLabel(v)}
+                  {v.price > 0 ? ` — ฿${formatCurrency(v.price)}` : ' — สอบถามราคา'}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : (
+          <div className="space-y-1">
+            {product.size && (
+              <div className="flex gap-1">
+                <span className="shrink-0 text-slate-400">ขนาด</span>
+                <span className="break-words">{prettyThaiText(product.size)}</span>
+              </div>
+            )}
+            {product.model && (
+              <div className="flex gap-1">
+                <span className="shrink-0 text-slate-400">รุ่น</span>
+                <span className="break-words">{prettyThaiText(product.model)}</span>
+              </div>
+            )}
+            {product.brand && (
+              <div className="flex gap-1">
+                <span className="shrink-0 text-slate-400">ยี่ห้อ</span>
+                <span className="break-words">{prettyThaiText(product.brand)}</span>
+              </div>
+            )}
           </div>
         )}
-        {product.model && (
-          <div className="flex gap-1">
-            <dt className="shrink-0 text-slate-400">รุ่น</dt>
-            <dd className="break-words">{prettyThaiText(product.model)}</dd>
-          </div>
-        )}
-        {product.brand && (
-          <div className="flex gap-1">
-            <dt className="shrink-0 text-slate-400">ยี่ห้อ</dt>
-            <dd className="break-words">{prettyThaiText(product.brand)}</dd>
-          </div>
-        )}
-        <div className="flex gap-1">
-          <dt className="shrink-0 text-slate-400">หน่วย</dt>
-          <dd>{prettyThaiText(product.unit)}</dd>
-        </div>
-      </dl>
 
-      {product.note && <p className="mt-1 text-xs italic text-accent-hover">{product.note}</p>}
+        <div className="flex gap-1">
+          <span className="shrink-0 text-slate-400">หน่วย</span>
+          <span>{prettyThaiText(product.unit)}</span>
+        </div>
+      </div>
 
       <div className="mt-auto flex items-end justify-between gap-3 pt-4">
         <div>
@@ -92,7 +124,7 @@ export function ProductCard({ product }: ProductCardProps) {
               value={qty}
               onChange={(event) => setQty(Number(event.target.value))}
               onFocus={(event) => event.currentTarget.select()}
-              aria-label={'จำนวน ' + product.name}
+              aria-label={'จำนวน ' + prettyThaiText(product.name)}
               className="w-16 rounded-md border border-slate-300 bg-white px-2 py-1 text-right text-sm text-slate-900 focus:border-royal focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
             />
           </label>

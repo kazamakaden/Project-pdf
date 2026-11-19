@@ -49,7 +49,12 @@ try {
       const h1 = document.querySelector('h1')?.textContent?.trim();
       const vat = document.body.innerText.includes('ภาษีมูลค่าเพิ่ม');
       const old = document.body.innerText.includes('แคตตาล็อก');
-      return { imgs, numbers, h1, vat, oldWord: old };
+      const card = [...document.querySelectorAll('article')].find((el) => (el.textContent || '').includes('กรรไกร'));
+      const info = card ? {
+        title: card.querySelector('h3')?.textContent?.trim(),
+        selectOptions: [...(card.querySelectorAll('select option'))].map((o) => o.textContent.trim()),
+      } : null;
+      return { imgs, numbers, h1, vat, oldWord: old, cards: document.querySelectorAll('article').length, knifeCard: info };
     })()`, returnByValue: true,
   })).result.value;
   console.log(JSON.stringify(info));

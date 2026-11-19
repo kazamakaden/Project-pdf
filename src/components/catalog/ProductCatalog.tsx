@@ -3,6 +3,7 @@ import { AlertTriangle, Loader2, PackageSearch } from 'lucide-react';
 import { ProductCard } from '@/components/catalog/ProductCard';
 import { ProductFilters, type SortOption } from '@/components/catalog/ProductFilters';
 import { useCatalogFacets, useCatalogProducts, useProductStore } from '@/store/products';
+import { baseNameOf } from '@/utils/text';
 
 export function ProductCatalog() {
   const catalog = useCatalogProducts();
@@ -41,6 +42,21 @@ export function ProductCatalog() {
     });
     return sorted;
   }, [catalog, search, category, size, sort]);
+
+  /**
+   * รวมสินค้าตระกูลเดียวกัน (ชื่อหลัก + หน่วย ตรงกัน) เป็นการ์ดเดียว
+   * เพื่อให้สินค้าอย่าง "กรรไกร" ที่มี 6/7/8 นิ้ว อยู่ในกล่องเดียวและเลือกขนาดได้
+   */
+  const groups = useMemo(() => {
+    const map = new Map<string, typeof visible>();
+    for (const product of visible) {
+      const key = baseNameOf(product.name, product.size).toLowerCase() + '|' + product.unit;
+      const list = map.get(key);
+      if (list) list.push(product);
+      else map.set(key, [product]);
+    }
+    return [...map.values()];
+  }, [visible]);
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
@@ -95,8 +111,8 @@ export function ProductCatalog() {
         </div>
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {visible.map((product) => (
-            <ProductCard key={product.id} product={product} />
+          {groups.map((variants) => (
+            <ProductCard key={variants[0].id} variants={variants} />
           ))}
         </div>
       )}
