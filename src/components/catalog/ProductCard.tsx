@@ -34,7 +34,13 @@ export function ProductCard({ variants }: ProductCardProps) {
 
   const optionLabel = (v: Product) => {
     const bits = [v.size, v.model, v.brand].map((x) => prettyThaiText(x)).filter(Boolean);
-    return bits.length ? bits.join(' · ') : prettyThaiText(v.name);
+    if (bits.length) return bits.join(' · ');
+    // ไม่มีข้อมูลขนาด/รุ่นแยก: ตัดชื่อหลักออกจากชื่อเต็ม แล้วใช้ส่วนที่เหลือเป็นตัวเลือก
+    const tail = prettyThaiText(v.name)
+      .replace(baseName, '')
+      .replace(/^[\s/]+/u, '')
+      .trim();
+    return tail || prettyThaiText(v.name);
   };
 
   const handleAdd = () => {
